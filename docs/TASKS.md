@@ -99,4 +99,4 @@ Use `debug.onDidStartDebugSession` to record debugging iterations for the curren
 Known limitations to fix along the way (good challenges in their own right):
 - The sandbox doesn't block network access (Node 22's permission model doesn't cover it).
 - Repeated failing *submissions* each create negative evidence. Iterate with "Run visible tests"; submit when you think you're done.
-- The VS Code extension has no automated UI tests yet: only unit tests for its pure modules.
+- The VS Code extension's smoke test uses a fake VS Code API: it checks the logic, not the real UI. The webview (`media/panel.js`) has no automated tests.
