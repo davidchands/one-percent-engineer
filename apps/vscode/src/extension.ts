@@ -273,11 +273,14 @@ export function activate(context: vscode.ExtensionContext) {
     state.lastSubmit = { allPassed: r.allPassed, independence: r.independence };
     state.attempt = r.attempt;
     if (r.allPassed) {
-      const choice = await vscode.window.showInformationMessage(
-        `Passed (${r.independence.replace("_", " ")}). Write the journal entry while it's fresh.`,
-        "Open journal",
-      );
-      if (choice) openWeb(`/journal/new?attempt=${attempt.id}&title=${encodeURIComponent(state.challenge!.title)}`);
+      // Don't await: a notification with a button stays open until clicked, and awaiting it
+      // would leave the panel stuck on "Submitting…" with the old (still-ticking) attempt.
+      const title = state.challenge!.title;
+      void vscode.window
+        .showInformationMessage(`Passed (${r.independence.replace("_", " ")}). Write the journal entry while it's fresh.`, "Open journal")
+        .then((choice) => {
+          if (choice) openWeb(`/journal/new?attempt=${attempt.id}&title=${encodeURIComponent(title)}`);
+        });
     }
   }
 
@@ -376,6 +379,9 @@ export function activate(context: vscode.ExtensionContext) {
     if (msg.type === "ready") return push();
     if (msg.type === "command" && msg.command && commands[msg.command]) return commands[msg.command]!();
     if (msg.type === "submit") return act("Submitting…", () => submit(msg.explanation ?? "", Boolean(msg.usedOutsideHelp)));
+    if (msg.type === "openJournal" && state.attempt && state.challenge) {
+      return openWeb(`/journal/new?attempt=${state.attempt.id}&title=${encodeURIComponent(state.challenge.title)}`);
+    }
     if (msg.type === "backToToday") {
       currentId = null;
       await context.workspaceState.update("onePercent.currentChallenge", undefined);
