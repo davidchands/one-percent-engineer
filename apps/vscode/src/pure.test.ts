@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { homedir } from "node:os";
-import { placeTaskComment, renderTaskComment, stripLeadingComment, wrap } from "./markers.ts";
+import { placeTaskComment, reflow, renderTaskComment, stripLeadingComment, wrap } from "./markers.ts";
 import { challengeDir, challengeIdForFile, expandHome, isInside } from "./paths.ts";
 
 const ch = {
@@ -85,4 +85,14 @@ test("files map back to their challenge id", () => {
 
 test("~ expands to the home folder", () => {
   assert.equal(expandHome("~/x"), `${homedir()}/x`);
+});
+
+test("reflow joins wrapped sentences but keeps indented lines", () => {
+  const yaml = "Grades arrive as strings, so some\narrive like \"85.5\".\n\nThe intended behaviour:\n  averageGrade(grades)\n  topStudent(students)\n";
+  assert.equal(reflow(yaml), 'Grades arrive as strings, so some arrive like "85.5".\n\nThe intended behaviour:\n  averageGrade(grades)\n  topStudent(students)');
+});
+
+test("the task comment no longer breaks sentences at the source line breaks", () => {
+  const block = renderTaskComment({ ...ch, problem: "Grades arrive as strings, so some\narrive like 85.5." });
+  assert.match(block, /so some arrive like 85\.5\./);
 });

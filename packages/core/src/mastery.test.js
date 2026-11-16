@@ -1,16 +1,17 @@
 /**
- * SPEC for projectSkillState. These tests FAIL until you implement mastery.ts.
+ * SPEC for projectSkillState. These tests FAIL until you implement mastery.js.
  * Don't edit the tests to make them pass. If you think a rule is wrong,
  * argue it in your journal and with me first, then change the rule AND the test together.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { Evidence, EvidenceKind } from "@1pe/contracts";
-import { projectSkillState } from "./mastery.ts";
+import { projectSkillState } from "./mastery.js";
 
 const SKILL = "js.loops";
 let nextId = 1;
-function ev(kind: EvidenceKind, isoDate: string, opts: Partial<Evidence> = {}): Evidence {
+
+/** Builds one evidence row. `opts` overrides any field. */
+function ev(kind, isoDate, opts = {}) {
   return {
     id: nextId++,
     skillId: SKILL,

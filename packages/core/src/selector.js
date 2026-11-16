@@ -1,10 +1,20 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
  * ║  YOUR TASK (M1-b): implement selectNextActivity                  ║
- * ║  Spec: selector.test.ts. Do mastery.ts first; this depends on it.║
+ * ║  Spec: selector.test.js. Do mastery.js first; this depends on it.║
  * ╚══════════════════════════════════════════════════════════════════╝
  *
- * Decides today's ONE primary activity, and explains why with evidence.
+ * Plain JavaScript. Decides today's ONE primary activity, and explains why with evidence.
+ *
+ * INPUT (one object):
+ *   candidates  array of { id, title, skills: ["js.loops", …], targetLevel, difficulty }
+ *   graph       Map from skill id → skill node { id, prerequisites: [...], careerRelevance, … }
+ *   states      Map from skill id → skill state { level, justifiedBy: [...], … }  (from mastery.js)
+ *   passedIds   Set of challenge ids you've already passed
+ *
+ * OUTPUT: null, or { activityId, rationale: { summary, evidenceIds, gap, expectedOutcome, howMeasured, isPlaceholder } }
+ *
+ * A skill with no entry in `states` counts as level 0.
  *
  * THE RULES (the tests check each one):
  *
@@ -24,29 +34,42 @@
  * Later versions will add review urgency (nextReviewAt) and a recency penalty
  * for context domains. Leave those out for now.
  */
-import type { Rationale, SkillNode, SkillState, Level } from "@1pe/contracts";
 
-export interface Candidate {
-  id: string;
-  title: string;
-  skills: string[];
-  targetLevel: Level;
-  difficulty: number;
-}
+/**
+ * @typedef {import("@1pe/contracts").Rationale} Rationale
+ * @typedef {import("@1pe/contracts").SkillNode} SkillNode
+ * @typedef {import("@1pe/contracts").SkillState} SkillState
+ * @typedef {import("@1pe/contracts").Level} Level
+ */
 
-export interface SelectionInput {
-  candidates: Candidate[];
-  graph: Map<string, SkillNode>;
-  states: Map<string, SkillState>;
-  passedIds: Set<string>;
-}
+/**
+ * @typedef {object} Candidate
+ * @property {string} id
+ * @property {string} title
+ * @property {string[]} skills
+ * @property {Level} targetLevel
+ * @property {number} difficulty
+ */
 
-export interface Selection {
-  activityId: string;
-  rationale: Rationale;
-}
+/**
+ * @typedef {object} SelectionInput
+ * @property {Candidate[]} candidates
+ * @property {Map<string, SkillNode>} graph
+ * @property {Map<string, SkillState>} states
+ * @property {Set<string>} passedIds
+ */
 
-export function selectNextActivity(input: SelectionInput): Selection | null {
+/**
+ * @typedef {object} Selection
+ * @property {string} activityId
+ * @property {Rationale} rationale
+ */
+
+/**
+ * @param {SelectionInput} input
+ * @returns {Selection | null}
+ */
+export function selectNextActivity(input) {
   // PLACEHOLDER: picks the first challenge you haven't passed. Replace it.
   const next = input.candidates.find((c) => !input.passedIds.has(c.id));
   if (!next) return null;

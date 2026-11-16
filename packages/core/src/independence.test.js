@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { classifyIndependence, deriveEvidence } from "./independence.ts";
+import { classifyIndependence, deriveEvidence } from "./independence.js";
 
 const none = { maxHintIndex: null, totalHints: 0, solutionViewed: false, usedOutsideHelp: false };
 

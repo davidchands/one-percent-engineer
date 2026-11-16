@@ -4,7 +4,7 @@
  * Design notes:
  *  - Content (skills, challenges) lives in git under /content, NOT in the database.
  *    The database only stores what YOU did: attempts, events, submissions, evidence, journal.
- *  - `evidence` is append-only. Skill state is computed from it (see core/mastery.ts),
+ *  - `evidence` is append-only. Skill state is computed from it (see core/mastery.js),
  *    never stored as the source of truth.
  *  - Migrations are numbered and tracked with SQLite's `user_version` pragma.
  *    Never edit a migration that has already run: add a new one.

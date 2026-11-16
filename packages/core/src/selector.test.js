@@ -1,13 +1,12 @@
-/** SPEC for selectNextActivity. These tests FAIL until you implement selector.ts. */
+/** SPEC for selectNextActivity. These tests FAIL until you implement selector.js. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { SkillNode, SkillState } from "@1pe/contracts";
-import { selectNextActivity, type Candidate } from "./selector.ts";
+import { selectNextActivity } from "./selector.js";
 
-function node(id: string, prerequisites: string[] = [], careerRelevance = 0.5): SkillNode {
+function node(id, prerequisites = [], careerRelevance = 0.5) {
   return { id, name: id, domain: "js", phase: 1, why: "", prerequisites, careerRelevance, objectives: {} };
 }
-function state(skillId: string, level: number, justifiedBy: number[] = []): SkillState {
+function state(skillId, level, justifiedBy = []) {
   return {
     skillId,
     level,
@@ -18,7 +17,7 @@ function state(skillId: string, level: number, justifiedBy: number[] = []): Skil
     implemented: true,
   };
 }
-function cand(id: string, skills: string[], targetLevel = 4, difficulty = 2): Candidate {
+function cand(id, skills, targetLevel = 4, difficulty = 2) {
   return { id, title: id, skills, targetLevel, difficulty };
 }
 

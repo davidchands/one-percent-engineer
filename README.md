@@ -50,7 +50,7 @@ Read [docs/TASKS.md](docs/TASKS.md). Then do today's challenge before writing an
 | Path | What |
 |---|---|
 | `packages/contracts` | Zod schemas → shared types |
-| `packages/core` | `independence.ts` (worked example), `mastery.ts` + `selector.ts` (**your tasks**) |
+| `packages/core` | `independence.js` (worked example), `mastery.js` + `selector.js` (**your tasks**) |
 | `apps/server/src/services.ts` | every action, the layer the AI chat will call in M5 |
 | `apps/server/src/runner.ts` | sandboxed test runner |
 | `apps/server/src/db.ts` | schema + migrations |

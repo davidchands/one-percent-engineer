@@ -55,7 +55,7 @@ export function TodayPage() {
               {p.rationale.isPlaceholder && (
                 <div className="mt-3 rounded-lg border border-accent/30 bg-accent/5 px-3 py-2 text-sm text-accent">
                   Placeholder selector. Real, evidence-based selection is your task M1-b in{" "}
-                  <code>packages/core/src/selector.ts</code>.
+                  <code>packages/core/src/selector.js</code>.
                 </div>
               )}
               <p className="mt-3 text-sm leading-relaxed">{p.rationale.summary}</p>
@@ -85,7 +85,7 @@ export function TodayPage() {
         {!data.stats.projectionImplemented && (
           <Card className="p-5 text-sm text-muted">
             <span className="font-medium text-ink">Skill levels read 0 everywhere, on purpose.</span> Your evidence is being
-            recorded, but turning it into levels is task M1-a (<code>packages/core/src/mastery.ts</code>). When those tests
+            recorded, but turning it into levels is task M1-a (<code>packages/core/src/mastery.js</code>). When those tests
             pass, every past attempt is re-interpreted automatically, because levels are computed from evidence, never stored.
           </Card>
         )}
