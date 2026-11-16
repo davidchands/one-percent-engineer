@@ -19,17 +19,19 @@ pnpm validate:content   # quality gate for skills and challenges
 pnpm typecheck
 ```
 
+VS Code extension: `pnpm vscode:install`, then see [docs/VSCODE.md](docs/VSCODE.md).
+
 Requires Node ≥ 22.5 (uses the built-in `node:sqlite`) and pnpm.
 
 ## How it fits together
 
 ```
-apps/web  ──HTTP──►  apps/server  ──►  packages/core   (pure rules: mastery, selection)
- React + Vite         Fastify          packages/contracts (Zod schemas shared by everything)
-                        │
-                        ├─► SQLite (data/1pe.sqlite): what YOU did, as an append-only evidence log
-                        ├─► content/: skills + challenges, as files in git
-                        └─► sandbox: runs your code against tests in a restricted Node process
+apps/web     (React + Vite) ──HTTP──┐
+                                    ├──►  apps/server (Fastify)  ──►  packages/core       pure rules: mastery, selection
+apps/vscode  (extension)    ──HTTP──┘           │                     packages/contracts  schemas + types shared by everything
+                                                ├─► SQLite (data/1pe.sqlite): what YOU did, as an append-only evidence log
+                                                ├─► content/: skills + challenges, as files in git
+                                                └─► sandbox: runs your code against tests in a restricted Node process
 ```
 
 **Principles:**
@@ -53,5 +55,6 @@ Read [docs/TASKS.md](docs/TASKS.md). Then do today's challenge before writing an
 | `apps/server/src/runner.ts` | sandboxed test runner |
 | `apps/server/src/db.ts` | schema + migrations |
 | `apps/web/src/pages` | Today, Challenge, Challenges, Skills, Journal |
+| `apps/vscode` | VS Code extension: sidebar, challenge files, tests, timers ([docs](docs/VSCODE.md)) |
 | `content/skills` | the knowledge map |
 | `content/challenges/<id>` | `challenge.yaml`, `starter.mjs`, `public.test.mjs`, `hidden.test.mjs`, `solution.mjs`, `wrong/` |

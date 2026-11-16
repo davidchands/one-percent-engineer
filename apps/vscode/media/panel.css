@@ -1,0 +1,74 @@
+/* Uses VS Code's theme variables so the panel looks native in any theme. */
+body {
+  padding: 0 14px 24px;
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  line-height: 1.5;
+}
+h1 { font-size: 1.15em; font-weight: 600; margin: 4px 0 4px; line-height: 1.3; }
+h2 {
+  font-size: 0.75em; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--vscode-descriptionForeground); margin: 18px 0 6px;
+}
+p { margin: 6px 0; }
+ol, ul { margin: 4px 0; padding-left: 18px; }
+li { margin: 3px 0; }
+code, pre, .mono { font-family: var(--vscode-editor-font-family); font-size: 0.92em; font-variant-ligatures: none; }
+pre {
+  background: var(--vscode-textCodeBlock-background); padding: 8px; border-radius: 4px;
+  overflow-x: auto; white-space: pre-wrap; margin: 6px 0;
+}
+/* Code-shaped blocks (signatures, tables) must keep their columns: scroll instead of wrapping. */
+pre.code { white-space: pre; }
+p code { background: var(--vscode-textCodeBlock-background); padding: 0 3px; border-radius: 3px; }
+.muted { color: var(--vscode-descriptionForeground); }
+.small { font-size: 0.9em; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.spread { justify-content: space-between; }
+.tags { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+.tag {
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+  border-radius: 10px; padding: 0 7px; font-size: 0.85em; color: var(--vscode-descriptionForeground);
+}
+.tag.ok { color: var(--vscode-testing-iconPassed); border-color: var(--vscode-testing-iconPassed); }
+.tag.bad { color: var(--vscode-testing-iconFailed); border-color: var(--vscode-testing-iconFailed); }
+.tag.accent { color: var(--vscode-charts-yellow); border-color: var(--vscode-charts-yellow); }
+.card {
+  border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border));
+  border-radius: 6px; padding: 10px; margin: 8px 0;
+}
+.notice {
+  border-left: 3px solid var(--vscode-charts-yellow); padding: 6px 10px; margin: 8px 0;
+  background: var(--vscode-textBlockQuote-background);
+}
+.error { border-left-color: var(--vscode-errorForeground); }
+button {
+  background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground);
+  border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font: inherit;
+}
+button:hover:not(:disabled) { background: var(--vscode-button-secondaryHoverBackground); }
+button.primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
+button.primary:hover:not(:disabled) { background: var(--vscode-button-hoverBackground); }
+button.danger { background: transparent; color: var(--vscode-errorForeground); border: 1px solid var(--vscode-errorForeground); }
+button:disabled { opacity: 0.5; cursor: default; }
+button.link { background: none; padding: 0; color: var(--vscode-textLink-foreground); }
+textarea {
+  width: 100%; box-sizing: border-box; min-height: 90px; resize: vertical; font: inherit;
+  background: var(--vscode-input-background); color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent); border-radius: 3px; padding: 6px;
+}
+textarea:focus { outline: 1px solid var(--vscode-focusBorder); }
+label.check { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0; }
+.case { display: flex; gap: 6px; align-items: baseline; }
+.case .icon { width: 1em; flex-shrink: 0; }
+.pass { color: var(--vscode-testing-iconPassed); }
+.fail { color: var(--vscode-testing-iconFailed); }
+.metric { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--vscode-widget-border, transparent); }
+.prov { font-size: 0.8em; padding: 0 5px; border-radius: 8px; border: 1px solid currentColor; }
+.prov.observed { color: var(--vscode-charts-blue); }
+.prov.manual { color: var(--vscode-charts-yellow); }
+.prov.inferred { color: var(--vscode-descriptionForeground); }
+details summary { cursor: pointer; color: var(--vscode-descriptionForeground); margin: 10px 0 4px; }
+.hint { border-left: 2px solid var(--vscode-charts-yellow); padding: 2px 8px; margin: 6px 0; }
+.busy { color: var(--vscode-descriptionForeground); font-style: italic; }

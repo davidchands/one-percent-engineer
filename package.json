@@ -4,10 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm -r --parallel --reporter=append-only --filter \"./apps/*\" run dev",
-    "test": "pnpm -r run test",
+    "test": "pnpm -r --no-bail --no-sort run test",
     "test:core": "pnpm --filter @1pe/core run test",
     "validate:content": "pnpm --filter @1pe/server run validate:content",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "vscode:package": "pnpm --filter one-percent-engineer run package",
+    "vscode:install": "pnpm vscode:package && \"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code\" --install-extension apps/vscode/dist/one-percent-engineer.vsix --force"
   },
-  "engines": { "node": ">=22.5" }
+  "engines": {
+    "node": ">=22.5"
+  }
 }
