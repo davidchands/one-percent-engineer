@@ -80,8 +80,11 @@
 
     // Primary actions
     html += `<div class="row" style="margin-top:10px">`;
-    if (!open) {
-      html += `<button class="primary" data-cmd="onePercent.start" ${busy ? "disabled" : ""}>${passed ? "Open files / new attempt" : "Start challenge"}</button>`;
+    if (!open && passed) {
+      html += `<button class="primary" data-msg="openJournal">Write journal entry</button>
+               <button data-cmd="onePercent.start" ${busy ? "disabled" : ""}>Open files / new attempt</button>`;
+    } else if (!open) {
+      html += `<button class="primary" data-cmd="onePercent.start" ${busy ? "disabled" : ""}>Start challenge</button>`;
     } else {
       html += `<button data-cmd="onePercent.start" ${busy ? "disabled" : ""}>${state.filesExist ? "Open solution.mjs" : "Create files"}</button>
                <button class="primary" data-cmd="onePercent.runTests" ${busy ? "disabled" : ""}>Run tests</button>
