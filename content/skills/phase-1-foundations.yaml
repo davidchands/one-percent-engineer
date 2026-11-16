@@ -1,0 +1,210 @@
+# Skill graph: Phase 1 (programming foundations) and the start of Phase 2.
+#
+# This file is the stable KNOWLEDGE MAP. It says what there is to learn and what proves it.
+# The SEQUENCE you learn it in is decided adaptively (core/selector.ts), not by file order.
+#
+# Schema (validated by packages/contracts → SkillNode):
+#   id               dotted, lowercase: <domain>.<name>
+#   why              the real-world problem that created the need for this concept
+#   prerequisites    skill ids that must be ≥ level 3 before this is "ready"
+#   careerRelevance  0–1, how much this matters for your target roles (revisit as you read job ads)
+#   objectives       what evidence proves each level 1–6 FOR THIS SKILL, concretely
+#
+# YOUR M0 TASK: add `js.closures` (it belongs between js.scope and js.functions in the graph),
+# then add the rest of Phase 2. See docs/TASKS.md.
+
+skills:
+  - id: js.variables
+    name: Variables and bindings
+    domain: javascript
+    phase: 1
+    why: Programs need to remember values and refer to them by name while they run.
+    prerequisites: []
+    careerRelevance: 0.4
+    objectives:
+      "1": Define let, const and var, and say which you'd use by default.
+      "2": Explain the difference between reassigning a binding and mutating the value it points to.
+      "3": Fix a bug caused by const + mutation confusion, with a hint.
+      "4": Choose correct declarations in a new program without help.
+      "5": Predict behaviour of shadowed and hoisted bindings in unfamiliar code.
+      "6": Argue when a mutable binding is the better design, and its cost.
+
+  - id: js.types
+    name: Data types and coercion
+    domain: javascript
+    phase: 1
+    why: The same bits mean different things; data from users, files and networks arrives as strings.
+    prerequisites: [js.variables]
+    careerRelevance: 0.6
+    objectives:
+      "1": List the primitive types and what typeof returns for each.
+      "2": Explain why "5" + 3 and "5" - 3 differ, from the coercion rules.
+      "3": Fix a bug caused by string/number coercion, with a hint.
+      "4": Validate and convert external input correctly without help.
+      "5": Spot coercion bugs in unfamiliar code (form data, query strings, JSON).
+      "6": Decide where in a system to convert and validate types, and defend it.
+
+  - id: js.numbers
+    name: Numbers and floating point
+    domain: javascript
+    phase: 1
+    why: Money, measurements and counts must be calculated exactly, but computers store most decimals approximately.
+    prerequisites: [js.types]
+    careerRelevance: 0.6
+    objectives:
+      "1": State that JS numbers are IEEE-754 doubles and that 0.1 + 0.2 !== 0.3.
+      "2": Explain why binary floating point can't represent 0.1 exactly.
+      "3": Implement a money calculation in integer cents, with a hint.
+      "4": Implement exact money calculations independently, including rounding rules.
+      "5": Recognise floating-point risk in an unfamiliar domain (units, percentages, tax).
+      "6": Choose between integer minor units, decimal libraries and BigInt for a system, with trade-offs.
+
+  - id: js.operators
+    name: Operators and expressions
+    domain: javascript
+    phase: 1
+    why: Every decision and calculation a program makes is an expression that must evaluate exactly as intended.
+    prerequisites: [js.types]
+    careerRelevance: 0.4
+    objectives:
+      "1": Name arithmetic, comparison, logical and nullish operators.
+      "2": Explain short-circuit evaluation and the difference between || and ??.
+      "3": Fix an operator-precedence or || vs ?? bug, with a hint.
+      "4": Write correct compound expressions without help.
+      "5": Predict the value of unfamiliar compound expressions.
+      "6": Decide when an expression is too clever and should be split for readability.
+
+  - id: js.conditionals
+    name: Conditions and Boolean logic
+    domain: javascript
+    phase: 1
+    why: Real rules (pricing, permissions, eligibility) are full of cases, and every case must be handled exactly once.
+    prerequisites: [js.operators]
+    careerRelevance: 0.6
+    objectives:
+      "1": Write if/else, switch and the ternary operator.
+      "2": Explain truthiness and why ordering of branches matters.
+      "3": Implement a multi-rule decision with a hint.
+      "4": Implement complicated business rules independently, with no overlapping or missing cases.
+      "5": Find missing or contradictory cases in unfamiliar rule code.
+      "6": Choose between branching, lookup tables and rule objects for a rule set, and defend it.
+
+  - id: js.loops
+    name: Loops and iteration
+    domain: javascript
+    phase: 1
+    why: Programs process collections of unknown size (orders, students, log lines) one item at a time.
+    prerequisites: [js.conditionals]
+    careerRelevance: 0.6
+    objectives:
+      "1": Write for, while, for...of loops.
+      "2": Explain loop invariants and where off-by-one errors come from.
+      "3": Fix an off-by-one or wrong-accumulator bug, with a hint.
+      "4": Write correct loops over edge cases (empty, one item) without help.
+      "5": Trace the state of an unfamiliar loop by hand, iteration by iteration.
+      "6": Choose between loops and array methods for clarity and performance, and defend it.
+
+  - id: js.functions
+    name: Functions
+    domain: javascript
+    phase: 1
+    why: Large problems are only solvable when broken into named, reusable, testable pieces.
+    prerequisites: [js.variables]
+    careerRelevance: 0.8
+    objectives:
+      "1": Declare functions with parameters and return values.
+      "2": Explain the difference between a function's inputs, outputs and side effects.
+      "3": Split a long procedure into functions, with a hint.
+      "4": Design function boundaries for a new problem without help.
+      "5": Refactor unfamiliar code into well-named pure functions.
+      "6": Decide where side effects should live in a program, and defend it.
+
+  - id: js.scope
+    name: Scope and execution
+    domain: javascript
+    phase: 1
+    why: A program must know which variable a name refers to at each moment, or values leak and collide.
+    prerequisites: [js.functions]
+    careerRelevance: 0.6
+    objectives:
+      "1": Define global, function and block scope.
+      "2": Explain the call stack and what happens to local variables when a function returns.
+      "3": Fix a scope-related bug, with a hint.
+      "4": Predict scope behaviour while writing new code without help.
+      "5": Debug scope issues in unfamiliar code (loops with callbacks, shadowing).
+      "6": Decide how to structure module state to avoid shared mutable state, and defend it.
+
+  - id: js.error-handling
+    name: Error handling fundamentals
+    domain: javascript
+    phase: 1
+    why: Inputs are wrong, networks fail and disks fill up. Reliable software fails safely and clearly.
+    prerequisites: [js.functions, js.conditionals]
+    careerRelevance: 0.8
+    objectives:
+      "1": Use throw, try/catch/finally and Error objects.
+      "2": Explain the difference between validating input and catching exceptions.
+      "3": Add validation and meaningful errors to a function, with a hint.
+      "4": Design the failure behaviour of a new function independently (what throws, what returns).
+      "5": Find unsafe failure paths in unfamiliar code (partial updates, swallowed errors).
+      "6": Decide on an error strategy for a module (exceptions vs result values), and defend it.
+
+  - id: js.objects
+    name: Objects and state
+    domain: javascript
+    phase: 2
+    why: Real things (a product, an order, a student) have many related properties that must change together.
+    prerequisites: [js.functions, js.types]
+    careerRelevance: 0.8
+    objectives:
+      "1": Create, read and update object properties; use Object.keys/entries.
+      "2": Explain references vs copies and why mutating a shared object surprises callers.
+      "3": Implement a small stateful module with a hint.
+      "4": Implement state that can never become invalid, independently.
+      "5": Find state-corruption bugs in unfamiliar code.
+      "6": Decide what state to expose and what to encapsulate, and defend it.
+
+  - id: js.arrays
+    name: Arrays and array methods
+    domain: javascript
+    phase: 2
+    why: Most data arrives as lists, and most programs transform, filter and summarise lists.
+    prerequisites: [js.loops, js.functions]
+    careerRelevance: 0.9
+    objectives:
+      "1": Use push/pop/slice/splice and map/filter/find/reduce.
+      "2": Explain which methods mutate and which return new arrays, and why it matters.
+      "3": Rewrite a loop with map/filter/reduce, with a hint.
+      "4": Choose and chain array methods correctly without help.
+      "5": Predict output of unfamiliar method chains, including reduce.
+      "6": Decide when a chain hurts readability or performance, and defend it.
+
+  - id: thinking.decomposition
+    name: Problem decomposition
+    domain: engineering-thinking
+    phase: 1
+    why: Every non-trivial problem is too big to solve at once; engineers split it into parts they can reason about.
+    prerequisites: []
+    careerRelevance: 1.0
+    objectives:
+      "1": Describe decomposition and why it reduces errors.
+      "2": Explain inputs, outputs and sub-steps of a problem before coding.
+      "3": Decompose a problem into functions with a hint.
+      "4": Decompose an unfamiliar problem into testable parts independently.
+      "5": Decompose a problem in a domain you've never worked in.
+      "6": Compare two decompositions of the same system and defend the better one.
+
+  - id: thinking.debugging
+    name: Systematic debugging
+    domain: engineering-thinking
+    phase: 1
+    why: Code you didn't write (or wrote last month) breaks, and guessing wastes hours.
+    prerequisites: []
+    careerRelevance: 1.0
+    objectives:
+      "1": Describe reproduce → isolate → hypothesise → verify → fix.
+      "2": Explain why a fix without a root cause often creates new bugs.
+      "3": Find and fix a bug with a hint.
+      "4": Find the root cause of a bug in unfamiliar code independently, and add a test for it.
+      "5": Debug a failure in an unfamiliar codebase or technology.
+      "6": Decide how to prevent a class of bugs (tests, types, validation), and defend it.

@@ -1,0 +1,66 @@
+id: printing-cost
+title: University printing cost calculator
+type: implement
+difficulty: 2
+context: university
+skills: [thinking.decomposition, js.numbers, js.conditionals]
+targetLevel: 4
+objective: Practise problem decomposition on a rule set where the ORDER of rules changes the answer.
+problem: |
+  The university print shop charges students for print jobs. A student sends a list of jobs,
+  and the shop needs the total price in euro cents (an integer: the payment system rejects decimals).
+
+  Write `calculatePrintingCost(jobs)` and export it from solution.mjs.
+  Each job looks like: { pages: number, color: boolean, doubleSided: boolean }
+requirements:
+  - "Black-and-white pages cost 5 cents each. Colour pages cost 25 cents each."
+  - "Each student gets 10 free black-and-white pages per request. The allowance is shared across all jobs in the request and is used up in the order the jobs are listed. It never applies to colour pages."
+  - "A double-sided job costs 10% less than the same job printed single-sided. Apply this to the job's price after the free allowance, then round the job's price to the nearest cent (halves round up)."
+  - "If the total of all jobs is MORE than 2000 cents, take 5% off the total, then round to the nearest cent (halves round up)."
+  - "Return the final total as an integer number of cents. An empty list costs 0."
+  - "If `pages` is not a number, throw a TypeError. If it is a number but not a positive whole number, throw a RangeError."
+constraints:
+  - "Return an integer. Never return a value like 22.499999999999996."
+  - "Don't modify the jobs array or the job objects you're given."
+examples:
+  - input: "[{ pages: 20, color: false, doubleSided: false }]"
+    output: "50"
+    note: "10 pages free, 10 billable × 5 cents."
+  - input: "[{ pages: 10, color: true, doubleSided: true }]"
+    output: "225"
+    note: "10 × 25 = 250, minus 10% = 225."
+edgeCasesToConsider:
+  - "What happens when the free allowance runs out in the middle of a job?"
+  - "What if a colour job comes before a black-and-white job?"
+  - "What happens exactly AT the bulk discount threshold?"
+  - "Which rounding happens where, and does the order of rounding matter?"
+  - "What inputs could a careless caller pass in?"
+beforeCoding:
+  - "List every rule as a separate step. In what order must they be applied?"
+  - "What state must you carry from one job to the next?"
+  - "Work out the 2 examples by hand on paper first."
+  - "Write pseudocode with one function per rule."
+hints:
+  - "There are five separate rules here. Can you write them as five numbered steps, in order? Which rules apply to one job, and which apply to the whole request?"
+  - "The free allowance is the only rule that needs memory between jobs. What single variable would you need to keep track of it as you loop?"
+  - "To stay exact, keep every amount in integer cents. When you need 90% of a price, think about multiplying by 90 and dividing by 100 just before you round, rather than multiplying by 0.9."
+  - "One possible shape: validate(job) → billablePages(job, allowanceLeft) → jobPrice(billable, job) → sum → applyBulkDiscount(total). Each piece can be tested on its own."
+  - "Pseudocode: allowance = 10; total = 0; for each job: validate; if not colour: free = min(allowance, pages); allowance -= free; billable = pages - free (else billable = pages); price = billable × rate; if doubleSided: price = round(price × 90 / 100); total += price. Finally if total > 2000: total = round(total × 95 / 100)."
+commonMistakes:
+  - "Giving every job its own 10 free pages."
+  - "Applying the free allowance to colour pages."
+  - "Using >= 2000 for the bulk discount when the rule says MORE than."
+  - "Using 0.9 and 0.95 and getting floating-point totals."
+  - "Validating only some of the jobs, or not at all."
+explanationCheckpoint: |
+  Explain the order in which you applied the rules and why that order matters.
+  Give one concrete example where a different order would produce a different total.
+rubric:
+  - criterion: Correctness
+    description: All public and hidden tests pass.
+  - criterion: Decomposition
+    description: Each rule is a clearly identifiable step or function, not one tangled loop.
+  - criterion: Exactness
+    description: All arithmetic stays in integer cents; rounding happens only where the rules say.
+  - criterion: Explanation
+    description: Explains rule ordering with a correct concrete counter-example.

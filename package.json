@@ -1,0 +1,13 @@
+{
+  "name": "one-percent-engineer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel --reporter=append-only --filter \"./apps/*\" run dev",
+    "test": "pnpm -r run test",
+    "test:core": "pnpm --filter @1pe/core run test",
+    "validate:content": "pnpm --filter @1pe/server run validate:content",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "engines": { "node": ">=22.5" }
+}

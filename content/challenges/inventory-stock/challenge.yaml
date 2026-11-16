@@ -1,0 +1,67 @@
+id: inventory-stock
+title: Inventory that can never go negative
+type: implement
+difficulty: 3
+context: retail
+skills: [js.objects, js.error-handling, js.functions]
+targetLevel: 4
+objective: Design state that can never become invalid, even when an operation fails halfway.
+problem: |
+  A small online shop keeps stock counts per product (SKU). Twice last month, two orders were
+  accepted for the last item in stock and the count went to -1. Customers paid for products
+  that didn't exist.
+
+  Write `createInventory()` in solution.mjs. It returns an object with these methods:
+    add(sku, qty)          increase stock
+    remove(sku, qty)       decrease stock
+    removeMany(lines)      remove several products at once for one order: lines = [{ sku, qty }, ...]
+    quantity(sku)          current stock (number)
+    snapshot()             a plain object { [sku]: qty } of all stock
+requirements:
+  - "Stock for any SKU can never be negative. If a removal would make it negative, throw an Error and leave the stock unchanged."
+  - "removeMany is all-or-nothing: if ANY line can't be fulfilled, throw and remove nothing at all."
+  - "quantity() of a SKU that has never been added is 0."
+  - "qty must be a positive whole number, otherwise throw a RangeError. sku must be a non-empty string, otherwise throw a TypeError."
+  - "Every call to createInventory() creates a completely independent inventory."
+  - "snapshot() must not let the caller change the inventory by editing the returned object."
+constraints:
+  - "No classes needed (but allowed). No external libraries."
+  - "Error messages should name the SKU that caused the problem."
+examples:
+  - input: "inv.add('mug', 3); inv.remove('mug', 2); inv.quantity('mug')"
+    output: "1"
+  - input: "inv.add('mug', 1); inv.remove('mug', 2)"
+    output: "throws Error; inv.quantity('mug') is still 1"
+edgeCasesToConsider:
+  - "What if an order contains the same SKU on two separate lines?"
+  - "What if line 3 of an order fails after lines 1 and 2 were fine?"
+  - "What does a caller get back from snapshot(), and what happens if they change it?"
+  - "Where does your inventory's data actually live? Could two inventories see each other's data?"
+beforeCoding:
+  - "Write down the invariant: the one thing that must ALWAYS be true about the state."
+  - "For each method, decide: what can go wrong, and what state is left afterwards?"
+  - "Sketch removeMany as 'check everything, then change everything'. Why is that order important?"
+hints:
+  - "Start from the invariant: 'no SKU is ever below 0'. Every method must preserve it, including when it throws. Which method makes that hardest?"
+  - "If removeMany changes stock line by line and line 3 fails, lines 1 and 2 have already been removed. How could you find out whether the whole order is possible BEFORE changing anything?"
+  - "Two lines for the same SKU must be checked together. What if you first added up the requested quantity per SKU?"
+  - "Keep the data inside createInventory (a closure over a Map or object), not at the top of the module. For snapshot, return a COPY. Object.fromEntries or a spread creates a new object."
+  - "removeMany shape: validate all lines → total requested per SKU → if any total > stock, throw → only then subtract every total."
+commonMistakes:
+  - "Removing line by line in removeMany, leaving a half-processed order when a later line fails."
+  - "Checking each line separately, so two lines of the same SKU together exceed stock."
+  - "Storing stock in a module-level variable shared by every inventory."
+  - "Returning the internal object from snapshot()."
+explanationCheckpoint: |
+  Explain your invariant and how removeMany preserves it when an order fails partway.
+  Then explain why snapshot() returning the internal object would break the invariant
+  even if every method were written correctly.
+rubric:
+  - criterion: Correctness
+    description: All public and hidden tests pass.
+  - criterion: Atomicity
+    description: Checks happen before any mutation; a failed operation leaves state identical.
+  - criterion: Encapsulation
+    description: State is private to each inventory and never leaked by reference.
+  - criterion: Explanation
+    description: States the invariant precisely and connects snapshot copying to it.

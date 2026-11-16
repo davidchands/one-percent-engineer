@@ -1,0 +1,68 @@
+id: debug-grade-report
+title: "Debug: the grade report that says NaN"
+type: debug
+difficulty: 2
+context: education
+skills: [thinking.debugging, js.loops, js.types]
+targetLevel: 4
+objective: Find root causes systematically (reproduce, isolate, hypothesise, verify) instead of guessing.
+problem: |
+  A lecturer's grade report tool is broken. Grades are exported from a spreadsheet as CSV, so some
+  arrive as strings like "85.5". The report shows "NaN" for every student, and when it does show
+  something, the "top student" is sometimes wrong.
+
+  The starter code in solution.mjs is the CURRENT, BROKEN implementation. It contains MORE THAN ONE bug.
+  Find and fix all of them without rewriting the functions from scratch.
+
+  The intended behaviour:
+    averageGrade(grades)   → average of the grades, rounded to 1 decimal place.
+    topStudent(students)   → name of the student with the highest average.
+requirements:
+  - "averageGrade accepts numbers and numeric strings (\"85.5\" means 85.5)."
+  - "averageGrade of an empty list returns null (there is no average), not 0 and not NaN."
+  - "averageGrade throws a TypeError if any grade isn't numeric, and the message includes its index."
+  - "averageGrade rounds to 1 decimal place: 84.25 → 84.3."
+  - "topStudent skips students with no grades. If no one has grades, it returns null."
+  - "If two students tie, topStudent returns the name that comes first alphabetically."
+constraints:
+  - "Fix the existing code. Keep the function names and signatures."
+  - "For each bug, be able to say: how you reproduced it, what the root cause was, and how you verified the fix."
+examples:
+  - input: "averageGrade([80, 90])"
+    output: "85"
+  - input: "averageGrade([\"85.5\", 90])"
+    output: "87.8"
+  - input: "topStudent([{ name: 'Zola', grades: [90] }, { name: 'Amani', grades: [90] }])"
+    output: "'Amani'"
+edgeCasesToConsider:
+  - "What does each loop iteration actually read? Check the very last one."
+  - "What does + do when one side is a string?"
+  - "What does 0 / 0 produce?"
+  - "In the tie case, which student wins with the current comparison, and why?"
+beforeCoding:
+  - "Run the public tests first. Read the failures. Don't touch the code yet."
+  - "Pick ONE failing case. Predict what each variable holds at each step, then check with console.log."
+  - "Write down each hypothesis before you change anything."
+hints:
+  - "Start with averageGrade([80, 90]) only. Log `i` and `grades[i]` inside the loop. How many times does it run, and what's the last value it reads?"
+  - "Now try averageGrade(['85.5', 90]) with the loop fixed. Log `total` after each step. What type is it after the first addition?"
+  - "There are four bugs in total: two in averageGrade's loop, one about empty input, one in topStudent's comparison. Which ones have you found?"
+  - "For strings: Number('85.5') converts the whole string. parseInt('85.5') stops at the dot and gives 85. Which one matches the requirement? And how would you detect a value that isn't numeric at all?"
+  - "For ties: if you loop through students and replace the best whenever avg >= bestAvg, the LAST tied student wins. You need the alphabetically first instead: compare names when the averages are equal."
+commonMistakes:
+  - "Fixing the first bug, seeing different output, and assuming it's done."
+  - "Using parseInt, which silently truncates decimals."
+  - "Returning 0 for an empty list. 0 is a real grade; 'no grades' is different."
+  - "Rewriting everything instead of finding root causes. In a real codebase that hides what was wrong."
+explanationCheckpoint: |
+  For each bug you fixed: how did you reproduce it, what was the root cause,
+  and how did you verify the fix? Which bug was hiding another one?
+rubric:
+  - criterion: Correctness
+    description: All public and hidden tests pass.
+  - criterion: Root causes
+    description: Each fix addresses the cause, not the symptom (e.g. no `|| 0` patches).
+  - criterion: Minimal change
+    description: Fixes the existing code instead of rewriting it.
+  - criterion: Explanation
+    description: Reproduction, root cause and verification described for each bug.

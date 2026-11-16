@@ -1,0 +1,13 @@
+{
+  "name": "@1pe/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "tsx --test src/*.test.ts",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": { "@1pe/contracts": "workspace:*" },
+  "devDependencies": { "typescript": "^5.7.2", "tsx": "^4.19.2", "@types/node": "^22.10.2" }
+}
