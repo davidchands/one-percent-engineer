@@ -251,3 +251,5 @@ export const JournalEntry = NewJournalEntry.extend({
   updatedAt: z.string(),
 });
 export type JournalEntry = z.infer<typeof JournalEntry>;
+
+export type * from "./api.ts";

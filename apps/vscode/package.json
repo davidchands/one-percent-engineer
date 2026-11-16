@@ -1,0 +1,69 @@
+{
+  "name": "one-percent-engineer",
+  "displayName": "1% Engineer",
+  "description": "Today's engineering challenge inside VS Code: files, tests, hints, timers and submission.",
+  "version": "0.1.0",
+  "publisher": "davidchands",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": { "type": "git", "url": "https://github.com/davidchands/one-percent-engineer" },
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Education", "Other"],
+  "main": "./dist/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [{ "id": "onePercent", "title": "1% Engineer", "icon": "media/icon.svg" }]
+    },
+    "views": {
+      "onePercent": [{ "type": "webview", "id": "onePercent.today", "name": "Today" }]
+    },
+    "commands": [
+      { "command": "onePercent.refresh", "title": "Refresh", "category": "1% Engineer", "icon": "$(refresh)" },
+      { "command": "onePercent.start", "title": "Start / Open Today's Challenge", "category": "1% Engineer" },
+      { "command": "onePercent.runTests", "title": "Run Visible Tests", "category": "1% Engineer", "icon": "$(beaker)" },
+      { "command": "onePercent.hint", "title": "Reveal Next Hint", "category": "1% Engineer" },
+      { "command": "onePercent.toggleTimer", "title": "Start/Pause Thinking Timer", "category": "1% Engineer" },
+      { "command": "onePercent.submit", "title": "Submit for Evaluation", "category": "1% Engineer" },
+      { "command": "onePercent.viewSolution", "title": "Show Reference Solution", "category": "1% Engineer" },
+      { "command": "onePercent.insertTaskComment", "title": "Insert/Update Task Comment in Current File", "category": "1% Engineer" },
+      { "command": "onePercent.toggleTracking", "title": "Pause/Resume Activity Tracking", "category": "1% Engineer" },
+      { "command": "onePercent.showCollectedData", "title": "Show Data Collected This Session", "category": "1% Engineer" },
+      { "command": "onePercent.openInBrowser", "title": "Open Challenge in Browser", "category": "1% Engineer" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "onePercent.runTests", "when": "view == onePercent.today", "group": "navigation@1" },
+        { "command": "onePercent.refresh", "when": "view == onePercent.today", "group": "navigation@2" }
+      ]
+    },
+    "keybindings": [
+      { "command": "onePercent.runTests", "key": "ctrl+alt+t", "mac": "cmd+alt+t", "when": "onePercent.inChallenge" }
+    ],
+    "configuration": {
+      "title": "1% Engineer",
+      "properties": {
+        "onePercent.serverUrl": { "type": "string", "default": "http://127.0.0.1:4100", "description": "The local 1% Engineer server (started with `pnpm dev`)." },
+        "onePercent.webUrl": { "type": "string", "default": "http://127.0.0.1:5173", "description": "The web app, for 'Open in browser'." },
+        "onePercent.challengesDir": { "type": "string", "default": "~/Documents/1pe-practice", "description": "The ONLY folder the extension creates files in and observes. One subfolder per challenge." },
+        "onePercent.trackingEnabled": { "type": "boolean", "default": true, "description": "Record first-edit time in challenge files. Never observes files outside the challenges folder." }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "tsx --test src/*.test.ts",
+    "typecheck": "tsc -p .",
+    "package": "node build.mjs && vsce package --no-dependencies --allow-missing-repository -o dist/one-percent-engineer.vsix"
+  },
+  "devDependencies": {
+    "@1pe/contracts": "workspace:*",
+    "@types/node": "^22.10.2",
+    "@types/vscode": "~1.90.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

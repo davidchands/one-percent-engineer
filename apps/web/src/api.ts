@@ -3,14 +3,16 @@
  * (In M4 the VS Code extension gets an equivalent client; in M5 the chat calls the same actions.)
  */
 import type {
+  AttemptResponse,
+  AttemptSummary,
   ChallengePublic,
+  ChallengeRow,
   JournalEntry,
   NewJournalEntry,
-  Rationale,
-  SkillNode,
-  SkillState,
+  SkillRow,
+  SubmitResponse,
   TestRunResult,
-  Independence,
+  TodayResponse,
 } from "@1pe/contracts";
 
 export class ApiError extends Error {}
@@ -26,78 +28,10 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
   return data as T;
 }
 
-export interface Today {
-  date: string;
-  primary: null | {
-    challenge: {
-      id: string;
-      title: string;
-      objective: string;
-      type: string;
-      difficulty: number;
-      skills: string[];
-      phase: number;
-    };
-    rationale: Rationale;
-    passed: boolean;
-    openAttemptId: number | null;
-  };
-  stats: {
-    challengesPassed: number;
-    challengesTotal: number;
-    practicedDaysThisWeek: number;
-    projectionImplemented: boolean;
-  };
-  weaknesses: { skillId: string; name: string; failures: number; last: string }[];
-  reviews: { skillId: string; nextReviewAt: string | null }[];
-  recentJournal: JournalEntry[];
-}
-
-export interface Metric {
-  key: string;
-  label: string;
-  valueMs?: number | null;
-  count?: number;
-  provenance: "observed" | "manual" | "inferred";
-  caveat: string;
-  runningSince?: string | null;
-}
-
-export interface Attempt {
-  id: number;
-  challengeId: string;
-  status: "in_progress" | "passed" | "failed" | "abandoned";
-  independence: Independence | null;
-  startedAt: string;
-  endedAt: string | null;
-  hints: string[];
-  hintCount: number;
-  solution: string | null;
-  lastSubmission: null | { code: string; explanation: string; results: TestRunResult; createdAt: string };
-  metrics: Metric[];
-}
-
-export interface SkillRow extends SkillNode {
-  state: SkillState;
-  evidenceCount: number;
-  failures: number;
-}
-
-export interface ChallengeRow {
-  id: string;
-  title: string;
-  type: string;
-  difficulty: number;
-  skills: string[];
-  passed: boolean;
-}
-
-export interface SubmitResult {
-  results: TestRunResult;
-  allPassed: boolean;
-  independence: Independence;
-  attempt: Attempt;
-}
+export type Today = TodayResponse;
+export type Attempt = AttemptResponse;
+export type SubmitResult = SubmitResponse;
+export type { Metric, SkillRow, ChallengeRow } from "@1pe/contracts";
 
 export const api = {
   today: () => call<Today>("GET", "/today"),
@@ -105,10 +39,7 @@ export const api = {
   challenges: () => call<ChallengeRow[]>("GET", "/challenges"),
   challenge: (id: string) => call<ChallengePublic>("GET", `/challenges/${id}`),
   attempts: (challengeId: string) =>
-    call<{ id: number; status: string; independence: Independence | null; startedAt: string; endedAt: string | null }[]>(
-      "GET",
-      `/challenges/${challengeId}/attempts`,
-    ),
+    call<AttemptSummary[]>("GET", `/challenges/${challengeId}/attempts`),
   startAttempt: (challengeId: string) => call<Attempt>("POST", `/challenges/${challengeId}/attempts`),
   attempt: (id: number) => call<Attempt>("GET", `/attempts/${id}`),
   event: (id: number, kind: "timer_start" | "timer_pause" | "first_edit") =>

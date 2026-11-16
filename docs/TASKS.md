@@ -71,11 +71,27 @@ The hard part is `wrong/`: write the mistakes a learner would *really* make, the
 
 ---
 
+## M4 extension tasks (the extension exists; these extend it)
+
+### T4.1 Active coding time (inferred)
+Today the extension only reports *first edit*. Add an **active time** metric: time when VS Code is focused AND
+you've edited or moved the cursor in `solution.mjs` within the last 2 minutes.
+- Where: `apps/vscode/src/extension.ts` (events: `window.onDidChangeWindowState`, `onDidChangeTextEditorSelection`),
+  plus a new `active_time` event kind in `@1pe/contracts` and `services.ts`.
+- It must be labelled `inferred`, and its caveat must say what it can't tell you.
+- Before coding: what goes wrong if you send an event on every keystroke? How will you batch?
+
+**Done when:** active time shows in the process metrics, labelled `inferred`, and works offline (queued) without double-counting.
+
+### T4.2 Count debug sessions
+Use `debug.onDidStartDebugSession` to record debugging iterations for the current challenge (observed).
+
+---
+
 ## Up next (we'll plan each when you get there)
 
 | Milestone | What | You'll learn |
 |---|---|---|
-| M4 | VS Code extension: today's task, challenge files, test command, timers | Extension API, events, local sync |
 | M5 | AI mentor: explanation grading, Socratic hints, chat that calls the services | LLM integration, schemas, reliability |
 | M6 | Challenge generator through the same quality gate + spaced reviews | Pipelines, test design |
 | M7 | Weekly review + intelligence dashboard (after ~4 weeks of data) | Metric design, honest visualisation |
@@ -83,4 +99,4 @@ The hard part is `wrong/`: write the mistakes a learner would *really* make, the
 Known limitations to fix along the way (good challenges in their own right):
 - The sandbox doesn't block network access (Node 22's permission model doesn't cover it).
 - Repeated failing *submissions* each create negative evidence. Iterate with "Run visible tests"; submit when you think you're done.
-- Server response types for `/today` etc. are duplicated in `apps/web/src/api.ts`; they should move into `@1pe/contracts`.
+- The VS Code extension has no automated UI tests yet: only unit tests for its pure modules.
