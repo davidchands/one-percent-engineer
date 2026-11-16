@@ -38,6 +38,27 @@ export function wrap(text: string, width: number): string[] {
 
 const safe = (s: string) => s.replace(/\*\//g, "*\\/");
 
+/**
+ * Text from YAML keeps its source line breaks. Join wrapped prose lines back into sentences,
+ * but keep indented lines (signatures, tables) on their own lines.
+ */
+export function reflow(text: string): string {
+  return text
+    .trim()
+    .split(/\n\s*\n/)
+    .map((para) => {
+      const out: string[] = [];
+      for (const line of para.split("\n")) {
+        const indented = /^\s{2,}/.test(line);
+        const last = out[out.length - 1];
+        if (!indented && last !== undefined && !/^\s{2,}/.test(last)) out[out.length - 1] = `${last} ${line.trim()}`;
+        else out.push(indented ? line : line.trim());
+      }
+      return out.join("\n");
+    })
+    .join("\n\n");
+}
+
 export function renderTaskComment(ch: Pick<ChallengePublic, "id" | "title" | "objective" | "problem" | "requirements" | "constraints" | "beforeCoding">): string {
   const W = 74;
   const lines: string[] = [
@@ -47,7 +68,7 @@ export function renderTaskComment(ch: Pick<ChallengePublic, "id" | "title" | "ob
     ...wrap(`Objective: ${ch.objective}`, W),
     "",
     "Problem:",
-    ...wrap(ch.problem.trim(), W).map((l) => (l ? `  ${l}` : "")),
+    ...wrap(reflow(ch.problem), W).map((l) => (l ? `  ${l}` : "")),
     "",
     "Requirements:",
     ...ch.requirements.flatMap((r, i) => wrap(`${i + 1}. ${r}`, W - 2).map((l, j) => (j ? `     ${l}` : `  ${l}`))),

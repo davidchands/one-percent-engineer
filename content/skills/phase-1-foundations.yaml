@@ -1,7 +1,7 @@
 # Skill graph: Phase 1 (programming foundations) and the start of Phase 2.
 #
 # This file is the stable KNOWLEDGE MAP. It says what there is to learn and what proves it.
-# The SEQUENCE you learn it in is decided adaptively (core/selector.ts), not by file order.
+# The SEQUENCE you learn it in is decided adaptively (core/selector.js), not by file order.
 #
 # Schema (validated by packages/contracts → SkillNode):
 #   id               dotted, lowercase: <domain>.<name>

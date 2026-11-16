@@ -3,6 +3,9 @@
 This is "build it with me". The plumbing (server, database, sandbox, web app) exists so you can train **today**.
 The parts that decide what 1% Engineer *believes about you* are yours to write.
 
+**Language:** everything you write in Phases 1–4 is **plain JavaScript**: challenges, your core tasks, and their tests.
+The project's plumbing is TypeScript, but you never have to edit it. TypeScript is a deliberate level-up later (see "TypeScript level-up" below).
+
 **How to get help:** ask in chat. I'll start with questions and hints. Say "show me" explicitly if you want code.
 **Rule:** don't edit a spec test to make it pass. If you disagree with a rule, argue it first (journal + chat),
 then change the rule *and* its test together.
@@ -39,16 +42,16 @@ Add: `js.map-filter-reduce`, `ds.choosing-structures`, `algo.searching`, `algo.s
 
 Run with `pnpm test:core`. Right now 15 tests fail: those are this milestone.
 
-### T1.1 `projectSkillState` (`packages/core/src/mastery.ts`)
-Rules R1–R10 are in the file header. Spec: `mastery.test.ts`.
+### T1.1 `projectSkillState` (`packages/core/src/mastery.js`)
+Rules R1–R10 are in the file header. Spec: `mastery.test.js`.
 **Write the "before coding" answers in your journal first.** Then make the tests pass one rule at a time,
 in the order R1 → R10, running the tests after each.
 
 **Done when:** all `R*` tests pass, the Skills page shows real levels, and you can explain why R4 needs
 *two different days* (what is it protecting against?).
 
-### T1.2 `selectNextActivity` (`packages/core/src/selector.ts`)
-Rules S1–S6 in the file header. Spec: `selector.test.ts`.
+### T1.2 `selectNextActivity` (`packages/core/src/selector.js`)
+Rules S1–S6 in the file header. Spec: `selector.test.js`.
 The rationale text is user-facing: write it so that *you*, reading it tomorrow morning, understand why.
 
 **Done when:** all `S*` tests pass, and the Today page shows an evidence-based reason instead of the placeholder notice.
@@ -85,6 +88,18 @@ you've edited or moved the cursor in `solution.mjs` within the last 2 minutes.
 
 ### T4.2 Count debug sessions
 Use `debug.onDidStartDebugSession` to record debugging iterations for the current challenge (observed).
+
+---
+
+## TypeScript level-up (Phase 5, unlocks after your JavaScript foundations)
+
+TypeScript skills (`ts.basics`, `ts.modelling` in `content/skills/phase-5-typescript.yaml`) require `js.functions`,
+`js.objects`, `js.arrays` and `js.error-handling` at level 3+. Until then the selector ranks them below everything else.
+
+### T5.1 Convert your core to TypeScript
+Your first TypeScript task: convert the JavaScript you wrote in M1 (`mastery.js`, `selector.js`) to TypeScript.
+The JSDoc comments already describe every shape, so you'll be translating types you understand, not memorising syntax.
+**Done when:** the tests pass, `pnpm typecheck` passes with `strict` on, and there's no `any`.
 
 ---
 

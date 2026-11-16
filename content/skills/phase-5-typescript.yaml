@@ -1,0 +1,44 @@
+# Skill graph: Phase 5, TypeScript.
+#
+# TypeScript is a LEVEL-UP, not a starting point. Phases 1–4 are plain JavaScript.
+# These skills only become "ready" (see selector rule S3) once their JavaScript
+# prerequisites reach level 3, so the selector won't push TypeScript on you early.
+#
+# Why wait: TypeScript describes JavaScript. If you can't yet reason about what a
+# value IS at runtime (types, objects, functions, errors), type annotations become
+# ceremony you copy rather than a tool you think with.
+
+skills:
+  - id: ts.basics
+    name: TypeScript fundamentals
+    domain: typescript
+    phase: 5
+    why: >-
+      In large JavaScript codebases, many bugs are "this value isn't the shape I assumed".
+      TypeScript checks those assumptions before the code runs, and makes code easier to change safely.
+    prerequisites: [js.functions, js.objects, js.arrays, js.error-handling]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain what TypeScript adds to JavaScript, and that types are erased before the code runs.
+      "2": Explain the difference between a compile-time type error and a runtime error, with an example of each.
+      "3": Add type annotations to a small JavaScript module with help, so it passes the type checker.
+      "4": Convert a JavaScript module to TypeScript independently, without using `any` to silence errors.
+      "5": Read an unfamiliar typed codebase and explain what a type error is protecting against.
+      "6": Decide where strict types pay off and where they cost more than they save, and defend it.
+
+  - id: ts.modelling
+    name: Modelling data with types
+    domain: typescript
+    phase: 5
+    why: >-
+      Real data has states (pending, paid, refunded). Types can make invalid states
+      impossible to represent, so whole classes of bugs can't be written.
+    prerequisites: [ts.basics]
+    careerRelevance: 0.8
+    objectives:
+      "1": Define interfaces, type aliases, union types and literal types.
+      "2": Explain how a discriminated union prevents invalid states, and what narrowing is.
+      "3": Model a domain object (e.g. an order lifecycle) with union types, with help.
+      "4": Design types for a new feature so invalid states can't be constructed, independently.
+      "5": Find places in unfamiliar code where types allow invalid states, and fix them.
+      "6": Choose between runtime validation (e.g. Zod) and static types at a system boundary, and defend it.
