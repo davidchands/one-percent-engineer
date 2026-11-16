@@ -61,9 +61,17 @@ Then reload VS Code (Cmd+Shift+P → "Developer: Reload Window"). The server mus
 
 ```bash
 cd apps/vscode
-pnpm test        # unit tests for the pure modules (markers, paths)
+pnpm test        # unit tests (markers, paths) + end-to-end smoke test
 pnpm watch       # rebuild on change
 ```
+
+The smoke test (`test/smoke.test.cjs`) bundles the real extension, loads it with a fake `vscode`
+module (`test/fake-vscode.cjs`), and drives every command against a real server it starts on a free port,
+with a throwaway database and practice folder. It doesn't need `pnpm dev` and never touches your data.
+When you add a command, add a step to it. If the extension starts using a new VS Code API, add it to the fake.
+
+The fake models real VS Code behaviour that matters. In particular, a non-modal notification with buttons
+**never resolves on its own**: awaiting one is the bug the smoke test now guards against.
 
 To debug: open `apps/vscode` in VS Code and press F5 ("Run Extension"). Code layout:
 
@@ -75,3 +83,4 @@ To debug: open `apps/vscode` in VS Code and press F5 ("Run Extension"). Code lay
 | `src/api.ts` | HTTP client (no `vscode` import, so it's testable) |
 | `src/markers.ts` | task comment rendering and placement (pure, tested) |
 | `src/paths.ts` | path safety checks (pure, tested) |
+| `test/smoke.test.cjs`, `test/fake-vscode.cjs` | end-to-end smoke test and the fake VS Code API |
