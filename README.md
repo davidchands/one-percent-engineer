@@ -5,10 +5,23 @@ It runs entirely on your machine.
 
 ## Run it
 
+**Every day (no commands):** open **http://127.0.0.1:4100**. A macOS LaunchAgent starts the app at login.
+
+Set up once (or after pulling changes to the web app):
+
 ```bash
 pnpm install
-pnpm dev          # server on :4100, web app on http://127.0.0.1:5173
+pnpm autostart:install    # builds the web app, starts now and at every login
 ```
+
+| Command | What it does |
+|---|---|
+| `pnpm autostart:status` | Is it running? Where are the logs? |
+| `pnpm autostart:restart` | After changing server code or content |
+| `pnpm autostart:stop` / `start` | Stop until next login (e.g. to use `pnpm dev`) / start again |
+| `pnpm autostart:uninstall` | Remove auto-start (your data in `data/` stays) |
+
+**Developing the app itself** (live reload): `pnpm autostart:stop`, then `pnpm dev` (server on :4100, web on :5173).
 
 Other commands:
 
@@ -57,4 +70,4 @@ Read [docs/TASKS.md](docs/TASKS.md). Then do today's challenge before writing an
 | `apps/web/src/pages` | Today, Challenge, Challenges, Skills, Journal |
 | `apps/vscode` | VS Code extension: sidebar, challenge files, tests, timers ([docs](docs/VSCODE.md)) |
 | `content/skills` | the knowledge map |
-| `content/challenges/<id>` | `challenge.yaml`, `starter.mjs`, `public.test.mjs`, `hidden.test.mjs`, `solution.mjs`, `wrong/` |
+| `content/challenges/<id>` | `challenge.yaml`, `starter.js`, `public.test.js`, `hidden.test.js`, `solution.js`, `wrong/` |

@@ -13,9 +13,14 @@
   "dependencies": {
     "@1pe/contracts": "workspace:*",
     "@1pe/core": "workspace:*",
+    "@fastify/static": "^8.3.0",
     "fastify": "^5.2.0",
     "yaml": "^2.6.1",
     "zod": "^3.24.1"
   },
-  "devDependencies": { "typescript": "^5.7.2", "tsx": "^4.19.2", "@types/node": "^22.10.2" }
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
 }

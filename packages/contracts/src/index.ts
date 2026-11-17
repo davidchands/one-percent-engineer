@@ -66,14 +66,38 @@ export const ChallengeType = z.enum([
 ]);
 export type ChallengeType = z.infer<typeof ChallengeType>;
 
+/**
+ * A short lesson shown BEFORE the challenge. Required for beginner (difficulty 1) challenges.
+ * Order matters: the problem first, then why the concept exists, then how it works, then a
+ * worked example, then a prediction you make before seeing the answer.
+ */
+export const Lesson = z.object({
+  concept: z.string().describe("The ONE concept this lesson teaches"),
+  realWorldProblem: z.string(),
+  whyItExists: z.string(),
+  howItWorks: z.string(),
+  example: z.object({ code: z.string(), explanation: z.string() }),
+  predict: z.object({
+    code: z.string(),
+    question: z.string(),
+    answer: z.string(),
+    why: z.string(),
+  }),
+  commonMistake: z.string(),
+});
+export type Lesson = z.infer<typeof Lesson>;
+
 export const ChallengeMeta = z.object({
   id: z.string(),
   title: z.string(),
   type: ChallengeType,
   difficulty: z.number().int().min(1).max(5),
+  /** Suggested order among challenges of the same difficulty (lower first). */
+  sequence: z.number().int().optional(),
   skills: z.array(z.string()).min(1),
   targetLevel: Level,
   objective: z.string(),
+  lesson: Lesson.optional(),
   problem: z.string(),
   requirements: z.array(z.string()),
   constraints: z.array(z.string()),

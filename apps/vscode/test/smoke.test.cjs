@@ -127,12 +127,12 @@ test("daily loop through the extension", async (t) => {
     assert.equal(view.latest()?.status, "ready");
     id = view.latest().challenge.id;
     dir = path.join(practice, id);
-    sol = path.join(dir, "solution.mjs");
+    sol = path.join(dir, "solution.js");
   });
 
   await t.test("start creates the challenge files only inside the practice folder", async () => {
     await cmd("onePercent.start");
-    for (const f of ["solution.mjs", "public.test.mjs", "package.json"]) assert.ok(fs.existsSync(path.join(dir, f)), `${f} exists`);
+    for (const f of ["solution.js", "public.test.js", "package.json"]) assert.ok(fs.existsSync(path.join(dir, f)), `${f} exists`);
     assert.ok(fs.existsSync(path.join(practice, ".vscode/settings.json")), "AI-completions-off settings exist");
     assert.match(fs.readFileSync(sol, "utf8"), /<1pe:task id="/);
     assert.deepEqual(fs.readdirSync(tmp).filter((f) => !/^(practice|test\.sqlite.*|extension-.*)$/.test(f)), [], "nothing written elsewhere");
@@ -171,7 +171,7 @@ test("daily loop through the extension", async (t) => {
 
   await t.test("a passing submit finishes even while the 'Passed' notification is still open", async () => {
     // Regression: submit awaited a non-modal notification, leaving the panel stuck on "Submitting…".
-    fs.writeFileSync(sol, fs.readFileSync(path.join(CHALLENGES, id, "solution.mjs"), "utf8"));
+    fs.writeFileSync(sol, fs.readFileSync(path.join(CHALLENGES, id, "solution.js"), "utf8"));
     rec.answers.input.push("I fixed each root cause separately and verified every fix against a failing case first.");
     rec.answers.quick.push("No, only 1% Engineer hints");
     assert.equal(await within(cmd("onePercent.submit"), 5000), "done", "submit must not hang");
@@ -198,7 +198,7 @@ test("daily loop through the extension", async (t) => {
     await cmd("onePercent.showCollectedData");
     const report = rec.docs[rec.docs.length - 1].content;
     assert.match(report, /## Never collected/);
-    assert.match(report, /submitted solution\.mjs/);
+    assert.match(report, /submitted solution\.js/);
   });
 
   await t.test("no error messages were shown along the way", () => {

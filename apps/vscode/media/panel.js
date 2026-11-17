@@ -86,7 +86,7 @@
     } else if (!open) {
       html += `<button class="primary" data-cmd="onePercent.start" ${busy ? "disabled" : ""}>Start challenge</button>`;
     } else {
-      html += `<button data-cmd="onePercent.start" ${busy ? "disabled" : ""}>${state.filesExist ? "Open solution.mjs" : "Create files"}</button>
+      html += `<button data-cmd="onePercent.start" ${busy ? "disabled" : ""}>${state.filesExist ? "Open solution.js" : "Create files"}</button>
                <button class="primary" data-cmd="onePercent.runTests" ${busy ? "disabled" : ""}>Run tests</button>
                <button data-cmd="onePercent.toggleTimer" ${busy ? "disabled" : ""}>${timerRunning ? "Pause timer" : "Thinking timer"}</button>`;
     }
@@ -104,6 +104,22 @@
       if (state.lastSubmit && !state.lastSubmit.allPassed) {
         html += `<div class="notice small">Not all tests pass yet; the attempt stays open. Form a hypothesis, change one thing.</div>`;
       }
+    }
+
+    // Lesson first (beginner challenges). Open until you've passed.
+    if (ch.lesson) {
+      const L = ch.lesson;
+      html += `<details class="card" ${passed ? "" : "open"}><summary><b>Lesson · ${esc(L.concept)}</b></summary>
+        <h2>The real-world problem</h2>${problem(L.realWorldProblem)}
+        <h2>Why it exists</h2>${problem(L.whyItExists)}
+        <h2>How it works</h2>${problem(L.howItWorks)}
+        <h2>Worked example</h2><pre class="code">${esc(L.example.code.trim())}</pre>${problem(L.example.explanation)}
+        <h2>Predict before you run</h2><pre class="code">${esc(L.predict.code.trim())}</pre>
+        <p><b>${esc(L.predict.question)}</b></p>
+        <details><summary>Reveal answer (decide your guess first)</summary>
+          <p><code>${esc(L.predict.answer)}</code></p>${problem(L.predict.why)}</details>
+        <h2>Common mistake</h2>${problem(L.commonMistake)}
+      </details>`;
     }
 
     // Brief

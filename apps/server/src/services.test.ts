@@ -108,3 +108,15 @@ function emptyFields() {
     beginnerExplanation: "",
   };
 }
+
+test("beginners start with the easiest challenge, in the suggested sequence", () => {
+  const ctx = fresh();
+  assert.equal(svc.today(ctx).primary?.challenge.id, "temperature-converter");
+  const order = svc.listChallenges(ctx).map((c) => c.id);
+  assert.deepEqual(order.slice(0, 5), ["temperature-converter", "ticket-price", "cart-total", "count-vowels", "password-strength"]);
+});
+
+test("lessons reach the client", () => {
+  const pub = svc.getChallengePublic(fresh(), "temperature-converter");
+  assert.ok(pub.lesson?.predict.answer, "lesson with a prediction is included");
+});

@@ -11,7 +11,7 @@ problem: |
   accepted for the last item in stock and the count went to -1. Customers paid for products
   that didn't exist.
 
-  Write `createInventory()` in solution.mjs. It returns an object with these methods:
+  Write `createInventory()` in solution.js. It returns an object with these methods:
     add(sku, qty)          increase stock
     remove(sku, qty)       decrease stock
     removeMany(lines)      remove several products at once for one order: lines = [{ sku, qty }, ...]

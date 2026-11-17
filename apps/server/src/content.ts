@@ -2,11 +2,11 @@
  * Loads content-as-code from /content:
  *   content/skills/*.yaml                 → skill graph
  *   content/challenges/<id>/challenge.yaml → metadata (validated by Zod)
- *   content/challenges/<id>/starter.mjs   → what you start with
- *   content/challenges/<id>/public.test.mjs → tests you can see
- *   content/challenges/<id>/hidden.test.mjs → tests you can't see (edge cases)
- *   content/challenges/<id>/solution.mjs  → reference solution, never sent unless requested
- *   content/challenges/<id>/wrong/*.mjs   → plausible wrong solutions; validation proves the tests catch them
+ *   content/challenges/<id>/starter.js   → what you start with
+ *   content/challenges/<id>/public.test.js → tests you can see
+ *   content/challenges/<id>/hidden.test.js → tests you can't see (edge cases)
+ *   content/challenges/<id>/solution.js  → reference solution, never sent unless requested
+ *   content/challenges/<id>/wrong/*.js   → plausible wrong solutions; validation proves the tests catch them
  *
  * Invalid content fails loudly at startup instead of half-working.
  */
@@ -71,13 +71,13 @@ export function loadContent(dir = CONTENT_DIR): Content {
       meta: parsed.data,
       context: typeof raw.context === "string" ? raw.context : "general",
       dir: d,
-      starter: read("starter.mjs"),
-      publicTests: read("public.test.mjs"),
-      hiddenTests: read("hidden.test.mjs"),
-      solution: read("solution.mjs"),
+      starter: read("starter.js"),
+      publicTests: read("public.test.js"),
+      hiddenTests: read("hidden.test.js"),
+      solution: read("solution.js"),
       wrongSolutions: existsSync(wrongDir)
         ? readdirSync(wrongDir)
-            .filter((f) => f.endsWith(".mjs"))
+            .filter((f) => f.endsWith(".js"))
             .map((f) => ({ name: f, code: readFileSync(join(wrongDir, f), "utf8") }))
         : [],
     });

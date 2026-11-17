@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { averageGrade, topStudent } from "./solution.mjs";
+import { averageGrade, topStudent } from "./solution.js";
 
 test("averages numeric grades", () => assert.equal(averageGrade([80, 90]), 85));
 test("accepts numeric strings from CSV", () => assert.equal(averageGrade(["85.5", 90]), 87.8));

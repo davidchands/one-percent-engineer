@@ -1,0 +1,103 @@
+id: ticket-price
+title: Cinema ticket prices
+type: implement
+difficulty: 1
+sequence: 2
+context: cinema
+skills: [js.conditionals]
+targetLevel: 3
+objective: Turn a set of business rules into if / else if / else, and get the boundaries exactly right.
+lesson:
+  concept: Making decisions with if / else
+  realWorldProblem: |
+    A cinema charges different prices depending on the customer's age. The till must pick the right price
+    for every customer. If it gets the boundary wrong (is a 12-year-old a child or an adult?), the cinema
+    either loses money or overcharges families.
+  whyItExists: |
+    Programs constantly have to choose: is the password correct, is the item in stock, is this user an admin?
+    `if` lets a program run different code depending on whether a condition is true or false.
+  howItWorks: |
+    JavaScript checks the conditions from top to bottom and runs the FIRST block whose condition is true.
+    It then skips all the others.
+
+    Comparisons give true or false:
+      `<` less than, `<=` less than or equal, `>` greater than, `>=` greater than or equal, `===` equal.
+
+    Because the first true condition wins, the ORDER of your conditions matters.
+  example:
+    code: |
+      function grade(score) {
+        if (score >= 70) {
+          return "Distinction";
+        } else if (score >= 50) {
+          return "Pass";
+        } else {
+          return "Fail";
+        }
+      }
+
+      grade(85); // "Distinction"
+      grade(70); // "Distinction" (70 >= 70 is true)
+      grade(55); // "Pass"
+    explanation: |
+      For 85, the first condition is true, so "Distinction" is returned and the rest is skipped.
+      For 55, the first condition is false, the second is true, so "Pass".
+      `return` leaves the function immediately, which is why the order matters.
+  predict:
+    code: |
+      function size(n) {
+        if (n > 10) return "big";
+        else if (n > 100) return "huge";
+        else return "small";
+      }
+      console.log(size(500));
+    question: What does this print?
+    answer: big
+    why: |
+      500 > 10 is true, so the FIRST branch wins and "big" is returned. The "huge" branch can never run,
+      because anything greater than 100 is also greater than 10. The checks are in the wrong order.
+  commonMistake: |
+    Mixing up `<` and `<=` at the boundaries. Always test the exact boundary values (here: 11, 12, 64, 65).
+problem: |
+  Write a function `ticketPrice(age)` that returns the price of a cinema ticket in euros.
+
+  - Children under 12 pay 5.
+  - Seniors aged 65 or over pay 7.
+  - Everyone else pays 12.
+requirements:
+  - "Return 5 for ages 0 to 11."
+  - "Return 7 for ages 65 and over."
+  - "Return 12 for everyone else."
+  - "If the age is negative, return null (that age is impossible)."
+constraints:
+  - "Use if / else if / else."
+examples:
+  - input: "ticketPrice(8)"
+    output: "5"
+  - input: "ticketPrice(30)"
+    output: "12"
+  - input: "ticketPrice(70)"
+    output: "7"
+edgeCasesToConsider:
+  - "Exactly 12? Exactly 65? Exactly 11 and 64?"
+  - "A newborn (age 0)?"
+  - "An impossible age, like -1?"
+beforeCoding:
+  - "Draw a number line from 0 to 100 and mark where each price starts and ends."
+  - "Which check should come first, and why?"
+hints:
+  - "Write the three age groups as conditions in plain English first. Which one includes the number 12? Which one includes 65?"
+  - "\"Under 12\" means 11 is included but 12 isn't. Which comparison operator says that? And \"65 or over\": which operator includes 65 itself?"
+  - "Where does the impossible-age check belong? Think about what happens to -1 if the 'under 12' check runs first."
+  - "Shape: if (age < 0) return null; else if (age < 12) return 5; else if (age >= 65) return 7; else return 12."
+commonMistakes:
+  - "Using <= 12, which charges 12-year-olds the child price."
+  - "Using > 65, which charges 65-year-olds the adult price."
+  - "Checking 'under 12' before the negative check, so -1 gets a child ticket."
+explanationCheckpoint: |
+  Why did you put your conditions in that order? What would go wrong with a different order?
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including every boundary.
+  - criterion: Explanation
+    description: Explains why the order of conditions matters, with an example.

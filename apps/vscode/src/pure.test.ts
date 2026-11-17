@@ -66,9 +66,9 @@ test("starter header comments are stripped before adding the task block", () => 
 });
 
 test("isInside rejects escapes and sibling-prefix folders", () => {
-  assert.ok(isInside("/a/practice", "/a/practice/x/solution.mjs"));
+  assert.ok(isInside("/a/practice", "/a/practice/x/solution.js"));
   assert.ok(!isInside("/a/practice", "/a/practice/../secrets.txt"));
-  assert.ok(!isInside("/a/practice", "/a/practice-other/x.mjs"));
+  assert.ok(!isInside("/a/practice", "/a/practice-other/x.js"));
   assert.ok(!isInside("/a/practice", "/a/practice"));
 });
 
@@ -78,9 +78,9 @@ test("challenge ids must be safe folder names", () => {
 });
 
 test("files map back to their challenge id", () => {
-  assert.equal(challengeIdForFile("/r", "/r/printing-cost/solution.mjs"), "printing-cost");
+  assert.equal(challengeIdForFile("/r", "/r/printing-cost/solution.js"), "printing-cost");
   assert.equal(challengeIdForFile("/r", "/r/notes.md"), null);
-  assert.equal(challengeIdForFile("/r", "/elsewhere/solution.mjs"), null);
+  assert.equal(challengeIdForFile("/r", "/elsewhere/solution.js"), null);
 });
 
 test("~ expands to the home folder", () => {

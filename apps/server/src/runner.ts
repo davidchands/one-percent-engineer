@@ -28,9 +28,11 @@ export async function runTests(
 ): Promise<TestRunResult> {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "1pe-run-")));
   try {
-    writeFileSync(join(dir, "solution.mjs"), code);
-    const runs = [runSuite(dir, "public.test.mjs", suites.publicTests, false)];
-    if (suites.hiddenTests) runs.push(runSuite(dir, "hidden.test.mjs", suites.hiddenTests, true));
+    // package.json marks .js files as modern JavaScript modules (import/export).
+    writeFileSync(join(dir, "package.json"), '{ "type": "module" }\n');
+    writeFileSync(join(dir, "solution.js"), code);
+    const runs = [runSuite(dir, "public.test.js", suites.publicTests, false)];
+    if (suites.hiddenTests) runs.push(runSuite(dir, "hidden.test.js", suites.hiddenTests, true));
     const results = await Promise.all(runs);
     const cases = results.flatMap((r) => r.cases);
     return {

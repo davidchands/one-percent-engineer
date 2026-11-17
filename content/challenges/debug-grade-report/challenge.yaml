@@ -11,7 +11,7 @@ problem: |
   arrive as strings like "85.5". The report shows "NaN" for every student, and when it does show
   something, the "top student" is sometimes wrong.
 
-  The starter code in solution.mjs is the CURRENT, BROKEN implementation. It contains MORE THAN ONE bug.
+  The starter code in solution.js is the CURRENT, BROKEN implementation. It contains MORE THAN ONE bug.
   Find and fix all of them without rewriting the functions from scratch.
 
   The intended behaviour:

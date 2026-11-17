@@ -1,0 +1,88 @@
+id: temperature-converter
+title: Temperature converter
+type: implement
+difficulty: 1
+sequence: 1
+context: weather
+skills: [js.variables]
+targetLevel: 3
+objective: Turn a formula into a working function, using variables and the order in which JavaScript calculates.
+lesson:
+  concept: Expressions and the order of calculation
+  realWorldProblem: |
+    A weather app gets temperatures from a sensor in Celsius, but many of its users read Fahrenheit.
+    Every number shown on screen has to be converted correctly, every time, for any temperature.
+  whyItExists: |
+    A program is mostly calculations: prices, distances, scores, temperatures.
+    An expression is a piece of code that produces a value, like `2 + 3` or `price * quantity`.
+    Writing a formula as an expression inside a function means you write it once and reuse it everywhere,
+    instead of calculating by hand and making mistakes.
+  howItWorks: |
+    When JavaScript sees an expression, it calculates one step at a time, following rules
+    you already know from maths: multiplication and division happen before addition and subtraction.
+    Brackets change the order: whatever is inside them is calculated first.
+
+    A variable is a name for a value. `const total = 10 + 5;` calculates 15 and stores it under the name `total`.
+
+    A function takes input (its parameters) and gives back a result with `return`.
+  example:
+    code: |
+      function areaOfRectangle(width, height) {
+        const area = width * height;
+        return area;
+      }
+
+      areaOfRectangle(3, 4); // 12
+    explanation: |
+      `width` and `height` are the inputs. The expression `width * height` is calculated,
+      stored in the variable `area`, and then returned. Calling `areaOfRectangle(3, 4)` gives 12.
+  predict:
+    code: |
+      const a = 2 + 3 * 4;
+      const b = (2 + 3) * 4;
+      console.log(a, b);
+    question: What does this print?
+    answer: 14 20
+    why: |
+      For `a`, multiplication happens first: 3 * 4 = 12, then 2 + 12 = 14.
+      For `b`, the brackets go first: 2 + 3 = 5, then 5 * 4 = 20.
+  commonMistake: |
+    Forgetting `return`. A function that calculates the right value but doesn't `return` it
+    gives back `undefined`, and the tests will tell you so.
+problem: |
+  Write a function `celsiusToFahrenheit(celsius)` that converts a temperature from Celsius to Fahrenheit.
+
+  The formula is: Fahrenheit = Celsius × 9 / 5 + 32
+requirements:
+  - "Return the temperature in Fahrenheit as a number."
+  - "It must work for any temperature: zero, negative, and decimals like 21.5."
+constraints:
+  - "Don't round the result."
+examples:
+  - input: "celsiusToFahrenheit(0)"
+    output: "32"
+  - input: "celsiusToFahrenheit(100)"
+    output: "212"
+    note: "Water boils at 100 °C, which is 212 °F."
+edgeCasesToConsider:
+  - "What about a temperature below zero?"
+  - "Does the order of the calculation give the right answer for every input?"
+beforeCoding:
+  - "Work out celsiusToFahrenheit(10) on paper first. What should it be?"
+  - "Which part of the formula happens first?"
+hints:
+  - "The formula is already given. Your job is to write it as a JavaScript expression using the parameter `celsius`. What does `×` become in JavaScript?"
+  - "Remember the order: multiplication and division happen before addition. Do you need brackets to make + 32 happen last, or does that happen anyway?"
+  - "Check with 0: 0 * 9 / 5 is 0, plus 32 is 32. If your function gives 32 for 0 but not 212 for 100, look at the order of operations again."
+  - "One line is enough: return the expression that multiplies celsius by 9, divides by 5, and adds 32."
+commonMistakes:
+  - "Forgetting `return`, so the function gives back undefined."
+  - "Adding 32 before multiplying, e.g. (celsius + 32) * 9 / 5."
+  - "Rounding the result when the requirement says not to."
+explanationCheckpoint: |
+  In your own words: in what order does JavaScript calculate your expression, and why does that order give the right answer?
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including negative and decimal temperatures.
+  - criterion: Explanation
+    description: Explains the order of operations correctly.

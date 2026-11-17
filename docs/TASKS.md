@@ -65,7 +65,7 @@ The rationale text is user-facing: write it so that *you*, reading it tomorrow m
 
 ### T1.3 Write a challenge that passes the quality gate
 Pick a Phase 1 skill no current challenge covers (e.g. `js.scope`). Create `content/challenges/<id>/` with
-`challenge.yaml`, `starter.mjs`, `public.test.mjs`, `hidden.test.mjs`, `solution.mjs`, and at least 2 files in `wrong/`.
+`challenge.yaml`, `starter.js`, `public.test.js`, `hidden.test.js`, `solution.js`, and at least 2 files in `wrong/`.
 
 The hard part is `wrong/`: write the mistakes a learner would *really* make, then make sure your hidden tests catch them.
 (While building this tool, the gate caught a mistake in one of my own challenges. See the tie-breaking test in `debug-grade-report`.)
@@ -78,7 +78,7 @@ The hard part is `wrong/`: write the mistakes a learner would *really* make, the
 
 ### T4.1 Active coding time (inferred)
 Today the extension only reports *first edit*. Add an **active time** metric: time when VS Code is focused AND
-you've edited or moved the cursor in `solution.mjs` within the last 2 minutes.
+you've edited or moved the cursor in `solution.js` within the last 2 minutes.
 - Where: `apps/vscode/src/extension.ts` (events: `window.onDidChangeWindowState`, `onDidChangeTextEditorSelection`),
   plus a new `active_time` event kind in `@1pe/contracts` and `services.ts`.
 - It must be labelled `inferred`, and its caveat must say what it can't tell you.
