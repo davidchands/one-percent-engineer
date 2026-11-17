@@ -157,7 +157,8 @@ export function today(ctx: Ctx) {
     | { challenge_id: string; rationale: string }
     | undefined;
 
-  if (!plan) {
+  // No daily limit: once today's challenge is passed, today moves on to the next one.
+  if (!plan || passed.has(plan.challenge_id)) {
     const selection = selectNextActivity({
       candidates: inLearningOrder(ctx).map((c) => ({
         id: c.meta.id,
@@ -172,13 +173,21 @@ export function today(ctx: Ctx) {
     });
     if (selection) {
       ctx.db
-        .prepare("INSERT INTO daily_plans (date, challenge_id, rationale) VALUES (?, ?, ?)")
+        .prepare(
+          `INSERT INTO daily_plans (date, challenge_id, rationale) VALUES (?, ?, ?)
+           ON CONFLICT(date) DO UPDATE SET challenge_id = excluded.challenge_id, rationale = excluded.rationale`,
+        )
         .run(date, selection.activityId, JSON.stringify(selection.rationale));
       plan = { challenge_id: selection.activityId, rationale: JSON.stringify(selection.rationale) };
     }
   }
 
   const challenge = plan ? ctx.content.challenges.get(plan.challenge_id) : undefined;
+  const passedToday = (
+    ctx.db
+      .prepare("SELECT challenge_id, MIN(ended_at) AS at FROM attempts WHERE status = 'passed' AND ended_at >= ? GROUP BY challenge_id ORDER BY at")
+      .all(date) as { challenge_id: string }[]
+  ).map((r) => ({ id: r.challenge_id, title: ctx.content.challenges.get(r.challenge_id)?.meta.title ?? r.challenge_id }));
   const openAttempt = challenge
     ? (ctx.db
         .prepare("SELECT id FROM attempts WHERE challenge_id = ? AND status = 'in_progress' ORDER BY id DESC LIMIT 1")
@@ -226,6 +235,7 @@ export function today(ctx: Ctx) {
     stats: {
       challengesPassed: passed.size,
       challengesTotal: ctx.content.challenges.size,
+      passedToday,
       practicedDaysThisWeek: practicedDays,
       projectionImplemented: [...states.values()].every((s) => s.implemented),
     },

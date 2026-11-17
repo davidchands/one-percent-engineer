@@ -273,6 +273,7 @@ export function activate(context: vscode.ExtensionContext) {
     state.lastSubmit = { allPassed: r.allPassed, independence: r.independence };
     state.attempt = r.attempt;
     if (r.allPassed) {
+      state.today = await api.today(); // so the panel can offer the next challenge
       // Don't await: a notification with a button stays open until clicked, and awaiting it
       // would leave the panel stuck on "Submitting…" with the old (still-ticking) attempt.
       const title = state.challenge!.title;
@@ -382,7 +383,8 @@ export function activate(context: vscode.ExtensionContext) {
     if (msg.type === "openJournal" && state.attempt && state.challenge) {
       return openWeb(`/journal/new?attempt=${state.attempt.id}&title=${encodeURIComponent(state.challenge.title)}`);
     }
-    if (msg.type === "backToToday") {
+    // Today's plan moves on after a pass, so "next" is simply today's challenge.
+    if (msg.type === "backToToday" || msg.type === "nextChallenge") {
       currentId = null;
       await context.workspaceState.update("onePercent.currentChallenge", undefined);
       return refresh();

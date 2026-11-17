@@ -23,6 +23,8 @@ export interface TodayResponse {
   stats: {
     challengesPassed: number;
     challengesTotal: number;
+    /** Challenges passed today, in order. There's no daily limit. */
+    passedToday: { id: string; title: string }[];
     practicedDaysThisWeek: number;
     projectionImplemented: boolean;
   };

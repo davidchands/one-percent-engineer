@@ -120,3 +120,20 @@ test("lessons reach the client", () => {
   const pub = svc.getChallengePublic(fresh(), "temperature-converter");
   assert.ok(pub.lesson?.predict.answer, "lesson with a prediction is included");
 });
+
+test("no daily limit: passing today's challenge moves today on to the next one", async () => {
+  const ctx = fresh();
+  const first = svc.today(ctx).primary!.challenge.id;
+  const ch = content.challenges.get(first)!;
+  const a = svc.startAttempt(ctx, first);
+  await svc.submit(ctx, a.id, {
+    code: ch.solution,
+    explanation: "I worked out the rule first, then wrote it as one expression and returned the result.",
+    usedOutsideHelp: false,
+  });
+  const after = svc.today(ctx);
+  assert.notEqual(after.primary?.challenge.id, first, "today offers a new challenge");
+  assert.equal(after.primary?.passed, false);
+  assert.deepEqual(after.stats.passedToday.map((c) => c.id), [first]);
+  assert.equal(svc.today(ctx).primary?.challenge.id, after.primary?.challenge.id, "and it's stable until that one is passed");
+});

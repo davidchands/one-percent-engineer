@@ -573,6 +573,19 @@ function Metrics({ attempt, onAttempt }: { attempt: Attempt; onAttempt?: (a: Att
 
 /* ------------------------------------------------------------------ */
 
+/** Goes to whatever today's plan picks next. There's no daily limit. */
+function NextChallenge({ currentId }: { currentId: string }) {
+  const { data } = useLoad(api.today, [currentId]);
+  const next = data?.primary && data.primary.challenge.id !== currentId ? data.primary.challenge : null;
+  if (!data) return null;
+  if (!next) return <span className="self-center text-sm text-muted">That was the last challenge in the bank.</span>;
+  return (
+    <Button variant="primary" onClick={() => go(`/challenge/${next.id}`)}>
+      Next: {next.title} →
+    </Button>
+  );
+}
+
 function Finished({ ch, attempt, onRetry }: { ch: ChallengePublic; attempt: Attempt; onRetry: () => void }) {
   const independenceText: Record<string, string> = {
     independent: "Solved independently. This is strong evidence.",
@@ -590,10 +603,8 @@ function Finished({ ch, attempt, onRetry }: { ch: ChallengePublic; attempt: Atte
         <h2 className="text-lg font-semibold">{ch.title}</h2>
         <p className="text-sm text-muted">{attempt.independence && independenceText[attempt.independence]}</p>
         <div className="flex flex-wrap gap-2 pt-2">
-          <Button
-            variant="primary"
-            onClick={() => go(`/journal/new?attempt=${attempt.id}&title=${encodeURIComponent(ch.title)}`)}
-          >
+          <NextChallenge currentId={ch.id} />
+          <Button onClick={() => go(`/journal/new?attempt=${attempt.id}&title=${encodeURIComponent(ch.title)}`)}>
             Write journal entry
           </Button>
           <Button onClick={onRetry}>New attempt</Button>
