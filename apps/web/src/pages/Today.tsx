@@ -19,8 +19,17 @@ export function TodayPage() {
         <div>
           <div className="text-sm text-muted">{longDate(data.date)}</div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {p ? (p.passed ? "Today's objective is done." : "One objective today.") : "Nothing left in the challenge bank."}
+            {p
+              ? data.stats.passedToday.length
+                ? `${data.stats.passedToday.length} done today. Keep going?`
+                : "Today's challenge."
+              : "Nothing left in the challenge bank."}
           </h1>
+          {data.stats.passedToday.length > 0 && (
+            <p className="mt-2 text-sm text-muted">
+              Passed today: {data.stats.passedToday.map((c) => c.title).join(", ")}
+            </p>
+          )}
         </div>
 
         {p ? (

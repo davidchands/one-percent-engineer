@@ -57,7 +57,7 @@
     const busy = state.busy;
 
     let html = "";
-    if (!state.isToday) html += `<div class="notice small">Not today's objective. <button class="link" data-msg="backToToday">Back to today</button></div>`;
+    if (!state.isToday && !passed) html += `<div class="notice small">Not today's objective. <button class="link" data-msg="backToToday">Back to today</button></div>`;
     html += `
       <div class="tags">
         <span class="tag accent">${esc(ch.type)}</span>
@@ -81,7 +81,11 @@
     // Primary actions
     html += `<div class="row" style="margin-top:10px">`;
     if (!open && passed) {
-      html += `<button class="primary" data-msg="openJournal">Write journal entry</button>
+      const next = t && t.primary && t.primary.challenge.id !== ch.id ? t.primary.challenge : null;
+      html += next
+        ? `<button class="primary" data-msg="nextChallenge">Next: ${esc(next.title)} →</button>`
+        : `<span class="small muted">That was the last challenge in the bank.</span>`;
+      html += `<button data-msg="openJournal">Write journal entry</button>
                <button data-cmd="onePercent.start" ${busy ? "disabled" : ""}>Open files / new attempt</button>`;
     } else if (!open) {
       html += `<button class="primary" data-cmd="onePercent.start" ${busy ? "disabled" : ""}>Start challenge</button>`;
