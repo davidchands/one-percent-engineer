@@ -43,6 +43,7 @@ for (const ch of content.challenges.values()) {
   }
 
   if (ch.meta.hints.length < 3) fail(id, "needs at least 3 progressive hints");
+  if (ch.meta.difficulty === 1 && !ch.meta.lesson) fail(id, "beginner (difficulty 1) challenges must include a lesson");
   console.log(`  ${problems > problemsBefore ? "·" : "✓"} ${id}  (${ref.passed} tests, ${ch.wrongSolutions.length} wrong solutions caught)`);
 }
 

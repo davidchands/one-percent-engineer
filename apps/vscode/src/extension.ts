@@ -10,7 +10,7 @@
  * What it never does:
  *  - Modify files outside the challenges folder, except the task comment you explicitly request
  *    (applied as an unsaved, undoable edit you can inspect).
- *  - Read or send any file other than the challenge's solution.mjs, and only when you run/submit.
+ *  - Read or send any file other than the challenge's solution.js, and only when you run/submit.
  */
 import * as vscode from "vscode";
 import { existsSync } from "node:fs";
@@ -110,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   /* -------------------------- loading state -------------------------- */
 
-  const solutionPath = (id: string) => join(challengeDir(challengesRoot(), id), "solution.mjs");
+  const solutionPath = (id: string) => join(challengeDir(challengesRoot(), id), "solution.js");
   let currentId: string | null = context.workspaceState.get<string>("onePercent.currentChallenge") ?? null;
 
   async function refresh(challengeId?: string) {
@@ -185,11 +185,11 @@ export function activate(context: vscode.ExtensionContext) {
     // Create files only if missing. Never overwrite your solution.
     const dir = challengeDir(challengesRoot(), ch.id);
     await mkdir(dir, { recursive: true });
-    const sol = join(dir, "solution.mjs");
+    const sol = join(dir, "solution.js");
     if (!existsSync(sol)) {
       await writeFile(sol, `${renderTaskComment(ch)}\n\n${stripLeadingComment(ch.starterCode)}`);
     }
-    const pub = join(dir, "public.test.mjs");
+    const pub = join(dir, "public.test.js");
     if (!existsSync(pub)) await writeFile(pub, ch.publicTests);
     const pkg = join(dir, "package.json");
     if (!existsSync(pkg)) await writeFile(pkg, JSON.stringify({ type: "module", private: true, scripts: { test: "node --test" } }, null, 2) + "\n");
@@ -229,7 +229,7 @@ export function activate(context: vscode.ExtensionContext) {
     const path = solutionPath(ch.id);
     const open = vscode.workspace.textDocuments.find((d) => d.uri.fsPath === path);
     if (open?.isDirty) await open.save();
-    if (!existsSync(path)) throw new Error("No solution.mjs yet. Use 'Start' to create the challenge files.");
+    if (!existsSync(path)) throw new Error("No solution.js yet. Use 'Start' to create the challenge files.");
     return readFile(path, "utf8");
   }
 
@@ -238,7 +238,7 @@ export function activate(context: vscode.ExtensionContext) {
     const code = await readSolution();
     state.lastRun = await api.run(attempt.id, code);
     state.lastSubmit = null;
-    sentLog.push({ at: new Date().toISOString(), what: `sent solution.mjs (${code.length} chars) for a test run` });
+    sentLog.push({ at: new Date().toISOString(), what: `sent solution.js (${code.length} chars) for a test run` });
     state.attempt = await api.attempt(attempt.id);
     const r = state.lastRun;
     output.appendLine(`[${new Date().toLocaleTimeString()}] ${state.challenge?.id}: ${r.passed} passed, ${r.failed} failed${r.timedOut ? " (timed out)" : ""}`);
@@ -268,7 +268,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
     const code = await readSolution();
     const r = await api.submit(attempt.id, { code, explanation, usedOutsideHelp });
-    sentLog.push({ at: new Date().toISOString(), what: `submitted solution.mjs and explanation for attempt #${attempt.id}` });
+    sentLog.push({ at: new Date().toISOString(), what: `submitted solution.js and explanation for attempt #${attempt.id}` });
     state.lastRun = r.results;
     state.lastSubmit = { allPassed: r.allPassed, independence: r.independence };
     state.attempt = r.attempt;
@@ -344,14 +344,14 @@ export function activate(context: vscode.ExtensionContext) {
       "## Never collected",
       "- Files outside the challenges folder",
       "- Keystrokes, clipboard, terminal contents, other extensions' data",
-      "- File contents, except solution.mjs when YOU run tests or submit",
+      "- File contents, except solution.js when YOU run tests or submit",
     ].join("\n");
     const doc = await vscode.workspace.openTextDocument({ language: "markdown", content });
     await vscode.window.showTextDocument(doc, { preview: true });
   }
 
   function openWeb(path: string) {
-    const base = cfg().get<string>("webUrl", "http://127.0.0.1:5173").replace(/\/$/, "");
+    const base = cfg().get<string>("webUrl", "http://127.0.0.1:4100").replace(/\/$/, "");
     vscode.env.openExternal(vscode.Uri.parse(`${base}/#${path}`));
   }
 
@@ -405,7 +405,7 @@ export function activate(context: vscode.ExtensionContext) {
         .event(a.id, "first_edit")
         .then((updated) => {
           state.attempt = updated;
-          sentLog.push({ at: new Date().toISOString(), what: "first edit in solution.mjs (time only, no content)" });
+          sentLog.push({ at: new Date().toISOString(), what: "first edit in solution.js (time only, no content)" });
           push();
         })
         .catch(() => firstEditSent.delete(a.id));

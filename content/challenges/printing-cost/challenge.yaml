@@ -10,7 +10,7 @@ problem: |
   The university print shop charges students for print jobs. A student sends a list of jobs,
   and the shop needs the total price in euro cents (an integer: the payment system rejects decimals).
 
-  Write `calculatePrintingCost(jobs)` and export it from solution.mjs.
+  Write `calculatePrintingCost(jobs)` and export it from solution.js.
   Each job looks like: { pages: number, color: boolean, doubleSided: boolean }
 requirements:
   - "Black-and-white pages cost 5 cents each. Colour pages cost 25 cents each."

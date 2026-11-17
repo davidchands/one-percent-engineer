@@ -106,6 +106,19 @@ export function toPublic(ch: LoadedChallenge): ChallengePublic {
   return { ...rest, hintCount: hints.length, starterCode: ch.starter, publicTests: ch.publicTests };
 }
 
+/**
+ * Challenges in learning order: easiest first, then the suggested `sequence` within a difficulty,
+ * then id. The selector still decides; this just means ties and the placeholder favour beginner work.
+ */
+function inLearningOrder(ctx: Ctx): LoadedChallenge[] {
+  return [...ctx.content.challenges.values()].sort(
+    (a, b) =>
+      a.meta.difficulty - b.meta.difficulty ||
+      (a.meta.sequence ?? 999) - (b.meta.sequence ?? 999) ||
+      a.meta.id.localeCompare(b.meta.id),
+  );
+}
+
 function passedIds(ctx: Ctx): Set<string> {
   const rows = ctx.db.prepare("SELECT DISTINCT challenge_id FROM attempts WHERE status = 'passed'").all() as {
     challenge_id: string;
@@ -115,7 +128,7 @@ function passedIds(ctx: Ctx): Set<string> {
 
 export function listChallenges(ctx: Ctx) {
   const passed = passedIds(ctx);
-  return [...ctx.content.challenges.values()].map((c) => ({
+  return inLearningOrder(ctx).map((c) => ({
     id: c.meta.id,
     title: c.meta.title,
     type: c.meta.type,
@@ -146,7 +159,7 @@ export function today(ctx: Ctx) {
 
   if (!plan) {
     const selection = selectNextActivity({
-      candidates: [...ctx.content.challenges.values()].map((c) => ({
+      candidates: inLearningOrder(ctx).map((c) => ({
         id: c.meta.id,
         title: c.meta.title,
         skills: c.meta.skills,

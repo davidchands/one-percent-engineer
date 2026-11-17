@@ -9,7 +9,14 @@
     "validate:content": "pnpm --filter @1pe/server run validate:content",
     "typecheck": "pnpm -r run typecheck",
     "vscode:package": "pnpm --filter one-percent-engineer run package",
-    "vscode:install": "pnpm vscode:package && \"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code\" --install-extension apps/vscode/dist/one-percent-engineer.vsix --force"
+    "vscode:install": "pnpm vscode:package && \"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code\" --install-extension apps/vscode/dist/one-percent-engineer.vsix --force",
+    "build:web": "pnpm --filter @1pe/web build",
+    "autostart:install": "node scripts/autostart.mjs install",
+    "autostart:uninstall": "node scripts/autostart.mjs uninstall",
+    "autostart:start": "node scripts/autostart.mjs start",
+    "autostart:stop": "node scripts/autostart.mjs stop",
+    "autostart:restart": "node scripts/autostart.mjs restart",
+    "autostart:status": "node scripts/autostart.mjs status"
   },
   "engines": {
     "node": ">=22.5"

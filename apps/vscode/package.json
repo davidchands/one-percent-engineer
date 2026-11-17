@@ -44,7 +44,7 @@
       "title": "1% Engineer",
       "properties": {
         "onePercent.serverUrl": { "type": "string", "default": "http://127.0.0.1:4100", "description": "The local 1% Engineer server (started with `pnpm dev`)." },
-        "onePercent.webUrl": { "type": "string", "default": "http://127.0.0.1:5173", "description": "The web app, for 'Open in browser'." },
+        "onePercent.webUrl": { "type": "string", "default": "http://127.0.0.1:4100", "description": "The web app, for 'Open in browser'." },
         "onePercent.challengesDir": { "type": "string", "default": "~/Documents/1pe-practice", "description": "The ONLY folder the extension creates files in and observes. One subfolder per challenge." },
         "onePercent.trackingEnabled": { "type": "boolean", "default": true, "description": "Record first-edit time in challenge files. Never observes files outside the challenges folder." }
       }

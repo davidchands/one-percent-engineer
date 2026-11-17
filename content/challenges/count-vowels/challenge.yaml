@@ -1,0 +1,92 @@
+id: count-vowels
+title: Count the vowels
+type: implement
+difficulty: 1
+sequence: 4
+context: text
+skills: [js.loops, js.conditionals]
+targetLevel: 3
+objective: Loop over the characters of a string and count the ones that match a rule.
+lesson:
+  concept: Strings are lists of characters you can loop over
+  realWorldProblem: |
+    A reading-level tool for primary-school teachers estimates how hard a text is by counting syllables,
+    and the first step is counting vowels. The text can be any length and any mix of upper and lower case.
+  whyItExists: |
+    Almost every program handles text: names, messages, search queries, file contents.
+    Being able to look at text one character at a time lets you count, search, validate and transform it.
+  howItWorks: |
+    A string works a lot like an array of characters:
+      `"Hello".length` is 5, and `"Hello"[1]` is "e" (counting starts at 0).
+    So the same `for` loop you use for arrays works for strings.
+
+    Text can be "A" or "a". `.toLowerCase()` gives a lower-case copy: `"A".toLowerCase()` is "a".
+    That way you only have to check one version of each letter.
+
+    `"aeiou".includes(ch)` is true if `ch` is one of those letters.
+  example:
+    code: |
+      function countSpaces(text) {
+        let count = 0;
+        for (let i = 0; i < text.length; i++) {
+          if (text[i] === " ") {
+            count = count + 1;
+          }
+        }
+        return count;
+      }
+
+      countSpaces("to be or not"); // 3
+    explanation: |
+      Exactly the accumulator pattern from the cart-total lesson, but the loop visits characters instead of prices,
+      and an `if` decides which characters count.
+  predict:
+    code: |
+      const word = "JavaScript";
+      console.log(word.length, word[0], word[4].toLowerCase());
+    question: What does this print?
+    answer: 10 J s
+    why: |
+      "JavaScript" has 10 characters. Index 0 is "J". Index 4 is "S" (J-a-v-a-S), and lower-cased it's "s".
+  commonMistake: |
+    Only checking lower-case letters, so "A" in "Apple" isn't counted. Convert each character
+    (or the whole text) to lower case before comparing.
+problem: |
+  Write a function `countVowels(text)` that returns how many vowels are in a piece of text.
+
+  The vowels are a, e, i, o and u, in upper or lower case.
+requirements:
+  - "Count a, e, i, o, u, whether upper or lower case."
+  - "Don't count y."
+  - "Spaces, numbers and punctuation are not vowels."
+  - "Empty text has 0 vowels."
+constraints:
+  - "Use a loop over the characters."
+examples:
+  - input: "countVowels(\"hello world\")"
+    output: "3"
+  - input: "countVowels(\"\")"
+    output: "0"
+edgeCasesToConsider:
+  - "Capital letters like \"APPLE\"?"
+  - "Text with no vowels at all, like \"rhythm\"?"
+  - "Text with spaces and punctuation?"
+beforeCoding:
+  - "Count the vowels in \"Hello World\" by hand. Which ones did you nearly miss?"
+  - "How will your code decide whether one character is a vowel?"
+hints:
+  - "This is the accumulator pattern again: a count that starts at 0, a loop, and an if inside it. What's different from cart-total?"
+  - "Inside the loop, text[i] is one character. How can you check whether it's one of a, e, i, o, u without writing five separate ifs?"
+  - "Capital letters: what if you lower-case the character before checking it?"
+  - "Shape: let count = 0; for each i: const ch = text[i].toLowerCase(); if (\"aeiou\".includes(ch)) count = count + 1; return count."
+commonMistakes:
+  - "Forgetting capital letters."
+  - "Counting y as a vowel."
+  - "Using text.includes(...) on the whole text instead of checking each character."
+explanationCheckpoint: |
+  How does your code handle capital letters, and why does that approach work for every vowel?
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including capitals and text without vowels.
+  - criterion: Explanation
+    description: Explains the case-handling approach clearly.

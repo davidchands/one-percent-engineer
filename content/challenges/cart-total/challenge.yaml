@@ -1,0 +1,96 @@
+id: cart-total
+title: Shopping cart total
+type: implement
+difficulty: 1
+sequence: 3
+context: shopping
+skills: [js.loops]
+targetLevel: 3
+objective: Use a for loop with an accumulator to process a list of any length.
+lesson:
+  concept: Loops and the running total (accumulator)
+  realWorldProblem: |
+    An online shop shows the total of a customer's cart. One customer has 1 item, another has 40.
+    You can't write `prices[0] + prices[1] + prices[2]` because you don't know how many items there will be.
+  whyItExists: |
+    Programs process lists of unknown length all the time: orders, students, messages, sensor readings.
+    A loop repeats the same steps once for each item, however many there are.
+  howItWorks: |
+    An array is a list of values. `prices[0]` is the first item, `prices.length` is how many there are.
+    The last item is at `prices.length - 1`, because counting starts at 0.
+
+    A `for` loop has three parts: where to start, when to keep going, and how to move on:
+      for (let i = 0; i < prices.length; i++) { ... }
+    It starts with i = 0, runs the body while i < prices.length, and adds 1 to i after each round.
+
+    An accumulator is a variable you create BEFORE the loop and update INSIDE it, like a running total.
+  example:
+    code: |
+      function countLongWords(words) {
+        let count = 0;                       // the accumulator starts at 0
+        for (let i = 0; i < words.length; i++) {
+          if (words[i].length > 5) {
+            count = count + 1;               // update it each time
+          }
+        }
+        return count;                        // return it AFTER the loop
+      }
+
+      countLongWords(["hi", "elephant", "computer"]); // 2
+    explanation: |
+      `count` starts at 0. The loop visits each word once (i = 0, 1, 2). Two words are longer than 5 letters,
+      so count ends at 2. The return is after the loop, so it only happens once everything has been counted.
+  predict:
+    code: |
+      const nums = [10, 20, 30];
+      let total = 0;
+      for (let i = 1; i < nums.length; i++) {
+        total = total + nums[i];
+      }
+      console.log(total);
+    question: What does this print?
+    answer: "50"
+    why: |
+      The loop starts at i = 1, so nums[0] (the 10) is skipped. It adds 20 + 30 = 50.
+      Starting at 1 instead of 0 is one of the most common loop bugs: an "off-by-one" error.
+  commonMistake: |
+    Using `i <= prices.length`. The last round reads `prices[prices.length]`, which doesn't exist (it's undefined),
+    and adding undefined to a number gives NaN ("Not a Number").
+problem: |
+  Write a function `cartTotal(prices)` that adds up all the prices in a shopping cart.
+
+  Prices are whole numbers of cents (so 499 means €4.99). This avoids decimal rounding problems.
+requirements:
+  - "Return the sum of all prices."
+  - "An empty cart costs 0."
+  - "Don't change the array you're given."
+constraints:
+  - "Use a for loop (not .reduce): this challenge is about understanding loops."
+examples:
+  - input: "cartTotal([499, 250, 1000])"
+    output: "1749"
+  - input: "cartTotal([])"
+    output: "0"
+edgeCasesToConsider:
+  - "A cart with only one item?"
+  - "An empty cart: does your loop still return a number?"
+  - "Is the first item counted? Is the last item counted?"
+beforeCoding:
+  - "Add up [499, 250, 1000] by hand. Which number did you start with before adding the first price?"
+  - "Where does `return` go: inside the loop or after it?"
+hints:
+  - "You need a variable that remembers the total so far. What should it be before you've looked at any price?"
+  - "Inside the loop, `prices[i]` is the current price. How do you add it to your running total?"
+  - "Check your loop's start and stop: it should visit indexes 0 to prices.length - 1. Which comparison does that: < or <=?"
+  - "Shape: let total = 0; for (let i = 0; i < prices.length; i++) { total = total + prices[i]; } return total;"
+commonMistakes:
+  - "Starting the loop at 1, which skips the first item."
+  - "Using <= prices.length, which reads one item too many and gives NaN."
+  - "Putting `return` inside the loop, which stops after the first item."
+explanationCheckpoint: |
+  Explain what your accumulator variable holds after each round of the loop for [499, 250, 1000].
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the empty cart and single item.
+  - criterion: Explanation
+    description: Traces the accumulator round by round correctly.

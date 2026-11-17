@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { averageGrade, topStudent } from "./solution.mjs";
+import { averageGrade, topStudent } from "./solution.js";
 
 test("empty grade list has no average (null)", () => assert.equal(averageGrade([]), null));
 test("rounds to one decimal place", () => assert.equal(averageGrade([84, 84.5]), 84.3));

@@ -1,0 +1,106 @@
+id: password-strength
+title: Is this password strong enough?
+type: implement
+difficulty: 1
+sequence: 5
+context: security
+skills: [js.functions, thinking.decomposition]
+targetLevel: 3
+objective: Break one big rule into small helper functions that each answer one yes/no question.
+lesson:
+  concept: Breaking a problem into small functions
+  realWorldProblem: |
+    A university sign-up form must reject weak passwords. The rule has three parts, and next year
+    the security team will add a fourth. Code written as one tangled condition is hard to check and hard to change.
+  whyItExists: |
+    Big problems are easier when you split them into small questions you can answer one at a time.
+    A small function with a clear name ("hasDigit") is easy to test on its own, easy to read,
+    and easy to reuse. Changing one rule then means changing one small function.
+  howItWorks: |
+    A function can return true or false (a boolean). That makes it a yes/no question:
+      hasDigit("abc1") → true
+
+    Then the main function combines the answers with `&&` ("and"):
+      a && b is true only if BOTH a and b are true.
+
+    Checking a single character:
+      is it a digit?      ch >= "0" && ch <= "9"
+      is it upper case?   ch >= "A" && ch <= "Z"
+  example:
+    code: |
+      function hasSpace(text) {
+        for (let i = 0; i < text.length; i++) {
+          if (text[i] === " ") {
+            return true;        // found one: stop looking
+          }
+        }
+        return false;           // looked at everything: none
+      }
+
+      function isValidUsername(name) {
+        return name.length >= 3 && !hasSpace(name);
+      }
+
+      isValidUsername("ana");     // true
+      isValidUsername("a b c");   // false (has a space)
+    explanation: |
+      `hasSpace` answers one question and can return early as soon as it knows the answer.
+      `isValidUsername` reads almost like the rule in English. `!` means "not".
+  predict:
+    code: |
+      const long = "password".length >= 8;
+      const hasNumber = false;
+      console.log(long && hasNumber, long || hasNumber);
+    question: What does this print?
+    answer: false true
+    why: |
+      "password" has 8 characters, so `long` is true. `true && false` is false (both must be true).
+      `true || false` is true (`||` means "or": at least one must be true).
+  commonMistake: |
+    Returning false inside the loop as soon as ONE character isn't a digit. That stops the search too early.
+    Only return false after you've checked every character.
+problem: |
+  Write a function `isStrongPassword(password)` that returns true if a password is strong, and false otherwise.
+
+  A strong password:
+  1. is at least 8 characters long,
+  2. contains at least one digit (0–9), and
+  3. contains at least one upper-case letter (A–Z).
+requirements:
+  - "Return true only if all three rules are met; otherwise return false."
+  - "Return a boolean (true or false), not something else."
+  - "Write at least one helper function (for example hasDigit) and use it."
+constraints:
+  - "Don't use regular expressions (you'll learn them later): loop over the characters."
+examples:
+  - input: "isStrongPassword(\"Sunshine42\")"
+    output: "true"
+  - input: "isStrongPassword(\"sunshine42\")"
+    output: "false"
+    note: "No upper-case letter."
+edgeCasesToConsider:
+  - "Exactly 8 characters? Exactly 7?"
+  - "A digit or capital letter at the very start or the very end?"
+  - "A long password that's all lower-case letters?"
+beforeCoding:
+  - "Write the three rules as three yes/no questions."
+  - "Which questions need a loop? Which one doesn't?"
+  - "Name your helper functions before you write them."
+hints:
+  - "Rule 1 needs no loop: what property tells you how long a string is?"
+  - "For rule 2, write a helper hasDigit(text) that loops over the characters and returns true as soon as it finds a digit. What should it return if the loop finishes without finding one?"
+  - "Rule 3 is the same shape as rule 2 with a different check. Then combine all three answers with &&."
+  - "Shape: function hasDigit(t) { for each char: if (ch >= \"0\" && ch <= \"9\") return true; } return false; } — then return password.length >= 8 && hasDigit(password) && hasUpper(password);"
+commonMistakes:
+  - "Using > 8 instead of >= 8, which rejects exactly-8-character passwords."
+  - "Returning false inside the loop on the first non-matching character."
+  - "Only checking the length."
+explanationCheckpoint: |
+  Which helper functions did you write, and why does splitting the rule this way make it easier to test or change?
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the exact-length boundary.
+  - criterion: Decomposition
+    description: Uses helper functions with clear names; the main function reads like the rule.
+  - criterion: Explanation
+    description: Explains why the split makes the code easier to test or change.

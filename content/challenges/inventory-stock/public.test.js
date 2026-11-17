@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createInventory } from "./solution.mjs";
+import { createInventory } from "./solution.js";
 
 test("unknown SKUs have zero stock", () => assert.equal(createInventory().quantity("mug"), 0));
 test("add then remove updates stock", () => {

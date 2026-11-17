@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import type { ChallengePublic, TestRunResult } from "@1pe/contracts";
+import type { ChallengePublic, Lesson, TestRunResult } from "@1pe/contracts";
 import { api, type Attempt, type SubmitResult } from "../api.ts";
 import { Button, Card, Difficulty, ErrorNote, Label, Pill, Provenance, cx, formatMs, useLoad, useTick } from "../components/ui.tsx";
 import { go } from "../App.tsx";
@@ -80,6 +80,71 @@ export function ChallengePage({ id }: { id: string }) {
 }
 
 /* ------------------------------------------------------------------ */
+
+/**
+ * The lesson comes first: problem → why the concept exists → how it works → example → your prediction.
+ * The prediction's answer stays hidden until you've committed to a guess.
+ */
+function LessonCard({ lesson, startOpen }: { lesson: Lesson; startOpen: boolean }) {
+  const [guess, setGuess] = useState("");
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <details open={startOpen} className="group rounded-xl border border-accent/30 bg-accent/[0.03]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:px-6">
+        <span>
+          <Label>Lesson · read first</Label>
+          <span className="mt-1 block text-lg font-semibold">{lesson.concept}</span>
+        </span>
+        <span className="text-sm text-muted group-open:hidden">Show</span>
+      </summary>
+      <div className="space-y-6 px-5 pb-6 text-sm leading-relaxed sm:px-6">
+        <Section title="The real-world problem">
+          <ProblemText text={lesson.realWorldProblem} />
+        </Section>
+        <Section title="Why this concept exists">
+          <ProblemText text={lesson.whyItExists} />
+        </Section>
+        <Section title="How it works">
+          <ProblemText text={lesson.howItWorks} />
+        </Section>
+        <Section title="Worked example">
+          <pre className="overflow-x-auto rounded-lg border border-line bg-raised/50 p-3 text-xs leading-relaxed">{lesson.example.code.trim()}</pre>
+          <ProblemText text={lesson.example.explanation} />
+        </Section>
+        <Section title="Predict before you run">
+          <pre className="overflow-x-auto rounded-lg border border-line bg-raised/50 p-3 text-xs leading-relaxed">{lesson.predict.code.trim()}</pre>
+          <p className="font-medium">{lesson.predict.question}</p>
+          {!revealed ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 font-mono text-sm outline-none focus:border-faint"
+                placeholder="Your prediction"
+                value={guess}
+                onChange={(e) => setGuess(e.target.value)}
+              />
+              <Button onClick={() => setRevealed(true)} disabled={!guess.trim()}>
+                Check
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2 rounded-lg border border-line bg-raised/50 p-3">
+              <div>
+                <span className="text-faint">You said </span>
+                <code>{guess}</code>
+                <span className="text-faint"> · answer </span>
+                <code className="text-ok">{lesson.predict.answer}</code>
+              </div>
+              <ProblemText text={lesson.predict.why} />
+            </div>
+          )}
+        </Section>
+        <Section title="Common mistake">
+          <ProblemText text={lesson.commonMistake} />
+        </Section>
+      </div>
+    </details>
+  );
+}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -178,6 +243,8 @@ function Brief({ ch, attempt, onAttempt }: { ch: ChallengePublic; attempt: Attem
         <p className="mt-2 text-muted">{ch.objective}</p>
       </div>
 
+      {ch.lesson && <LessonCard lesson={ch.lesson} startOpen={!attempt || attempt.status === "in_progress"} />}
+
       <Card className="space-y-6 p-5 sm:p-6">
         <Section title="Problem">
           <ProblemText text={ch.problem} />
@@ -250,7 +317,7 @@ function Brief({ ch, attempt, onAttempt }: { ch: ChallengePublic; attempt: Attem
       </details>
 
       <details className="group rounded-xl border border-line bg-surface p-5">
-        <summary className="cursor-pointer text-sm text-muted group-open:text-ink">Visible tests (public.test.mjs)</summary>
+        <summary className="cursor-pointer text-sm text-muted group-open:text-ink">Visible tests (public.test.js)</summary>
         <pre className="mt-3 overflow-x-auto text-xs leading-relaxed text-muted">{ch.publicTests}</pre>
       </details>
     </div>
@@ -344,7 +411,7 @@ function Workspace({
     <>
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-          <span className="font-mono text-xs text-muted">solution.mjs</span>
+          <span className="font-mono text-xs text-muted">solution.js</span>
           <span className="text-xs text-faint">draft saved in this browser</span>
         </div>
         <textarea

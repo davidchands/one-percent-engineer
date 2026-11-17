@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createInventory } from "./solution.mjs";
+import { createInventory } from "./solution.js";
 
 test("removeMany is all-or-nothing when a later line fails", () => {
   const inv = createInventory();

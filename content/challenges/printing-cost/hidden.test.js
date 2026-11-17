@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { calculatePrintingCost as cost } from "./solution.mjs";
+import { calculatePrintingCost as cost } from "./solution.js";
 
 const bw = (pages, doubleSided = false) => ({ pages, color: false, doubleSided });
 const colour = (pages, doubleSided = false) => ({ pages, color: true, doubleSided });

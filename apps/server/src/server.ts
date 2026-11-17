@@ -3,6 +3,8 @@
  * Binds to 127.0.0.1 only: this is a personal, local system.
  */
 import Fastify, { type FastifyReply } from "fastify";
+import fastifyStatic from "@fastify/static";
+import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z, ZodError } from "zod";
@@ -14,6 +16,8 @@ import * as svc from "./services.ts";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const PORT = Number(process.env.PORT ?? 4100);
 const DB_PATH = process.env.DB_PATH ?? resolve(ROOT, "data/1pe.sqlite");
+/** The built web app (pnpm build:web). Served at / so everything lives on one address. */
+const WEB_DIST = resolve(ROOT, "apps/web/dist");
 
 export function buildApp(ctx: svc.Ctx) {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "warn" } });
@@ -58,6 +62,15 @@ export function buildApp(ctx: svc.Ctx) {
   app.put("/api/journal/:id", async (req) =>
     svc.updateJournal(ctx, idParam.parse(req.params).id, NewJournalEntry.parse(req.body)),
   );
+
+  // Serve the built web app if it exists. In development, Vite serves it on :5173 instead.
+  if (existsSync(WEB_DIST)) {
+    app.register(fastifyStatic, { root: WEB_DIST, prefix: "/" });
+  } else {
+    app.get("/", async (_req, reply) =>
+      reply.type("text/plain").send("1% Engineer API is running. Build the web app with `pnpm build:web` to serve it here."),
+    );
+  }
 
   return app;
 }
