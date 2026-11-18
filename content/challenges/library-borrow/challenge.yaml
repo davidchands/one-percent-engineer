@@ -1,0 +1,107 @@
+id: library-borrow
+title: Can this member borrow a book?
+type: implement
+difficulty: 1
+sequence: 6
+context: library
+skills: [js.operators]
+targetLevel: 3
+objective: Combine conditions with && and ||, and know which one JavaScript works out first.
+lesson:
+  concept: Logical operators (&& "and", || "or") and their order
+  realWorldProblem: |
+    A library's self-service machine decides in a split second whether someone may borrow a book.
+    The rule has several parts: is the card active, how many books do they already have, are they staff?
+    One wrong "and" or "or" means people get turned away, or the library loses its books.
+  whyItExists: |
+    Real rules are rarely one check. They're checks joined by "and" and "or".
+    Logical operators let you write the whole rule as one true/false answer.
+  howItWorks: |
+    `a && b` is true only when BOTH are true.
+    `a || b` is true when AT LEAST ONE is true.
+    `!a` flips true to false and false to true.
+
+    When you mix them, JavaScript does && before ||, just like it does × before +.
+    So `a || b && c` means `a || (b && c)`.
+    Brackets change the order, and they make your intention obvious to the next reader.
+  example:
+    code: |
+      function canVote(age, isCitizen) {
+        return age >= 18 && isCitizen;
+      }
+
+      function isWeekend(day) {
+        return day === "Saturday" || day === "Sunday";
+      }
+
+      canVote(20, true);     // true
+      canVote(20, false);    // false: both parts must be true
+      isWeekend("Sunday");   // true: one part is enough
+    explanation: |
+      Each comparison (`age >= 18`, `day === "Saturday"`) already gives true or false.
+      && and || join those answers into one. You don't need an `if`: the expression itself is the answer,
+      so you can return it directly.
+  predict:
+    code: |
+      console.log(true || false && false);
+    question: What does this print?
+    answer: "true"
+    why: |
+      && goes first: `false && false` is false. That leaves `true || false`, which is true.
+      If you read it left to right as `(true || false) && false`, you'd wrongly get false.
+      The same idea as 2 + 3 × 4 being 14, not 20.
+  commonMistake: |
+    Mixing && and || without brackets and assuming JavaScript reads left to right.
+    When a rule has both, add brackets so the grouping is exactly what the rule says.
+problem: |
+  Write a function `canBorrow(cardActive, booksOut, isStaff)` for the library machine.
+
+  - `cardActive` is true or false: is the member's library card active?
+  - `booksOut` is a whole number: how many books they have borrowed right now.
+  - `isStaff` is true or false: do they work at the library?
+
+  The rule:
+    Staff can always borrow, even with an inactive card and any number of books.
+    Everyone else can borrow only if their card is active AND they have fewer than 5 books out.
+
+  Return true if they can borrow, false if not.
+requirements:
+  - "Return true or false (a boolean), not a string."
+  - "Staff can always borrow."
+  - "Anyone else needs an active card and fewer than 5 books out. With exactly 5 books, they can't borrow."
+constraints:
+  - "Try to write it as a single `return` with && and || (no if). That's the skill this challenge practises."
+examples:
+  - input: "canBorrow(true, 2, false)"
+    output: "true"
+  - input: "canBorrow(false, 0, false)"
+    output: "false"
+    note: "Inactive card, not staff."
+  - input: "canBorrow(false, 9, true)"
+    output: "true"
+    note: "Staff can always borrow."
+edgeCasesToConsider:
+  - "Someone with exactly 5 books out. Is 5 'fewer than 5'?"
+  - "A staff member whose card has expired."
+  - "A staff member with lots of books out."
+beforeCoding:
+  - "Say the rule out loud with the words 'and' and 'or'. Which parts belong together?"
+  - "Which part of the rule makes the others not matter at all?"
+hints:
+  - "Split the rule into two ways of being allowed: one for staff, one for everyone else. How do you join two ways of being allowed?"
+  - "'Everyone else' needs two things at the same time: an active card and fewer than 5 books. Which operator means 'both'?"
+  - "Check the boundary: 5 books is not allowed. Is that `< 5` or `<= 5`? And check your grouping: staff must win even with 9 books."
+  - "Shape: return isStaff || (cardActive && booksOut < ___);"
+commonMistakes:
+  - "Using <= 5, which lets someone with 5 books borrow a 6th."
+  - "Using || where the rule says 'and', so an inactive card is enough on its own."
+  - "Grouping as (isStaff || cardActive) && booksOut < 5, which blocks staff who have 5 or more books."
+  - "Forgetting the staff rule entirely."
+explanationCheckpoint: |
+  Explain how JavaScript evaluates your return line for canBorrow(false, 9, true), step by step.
+  Then say what would change if you removed or moved your brackets.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including exactly 5 books and staff with many books.
+  - criterion: Explanation
+    description: Correctly says that && is evaluated before ||, and how the brackets show the rule's grouping.
