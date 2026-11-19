@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 330" width="920" height="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>The 1% Engineer learning loop</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f2b544"/>
+    </marker>
+    <style>
+      .card { fill: #14171c; stroke: #2a2f37; stroke-width: 1.5; }
+      .num { fill: #f2b544; }
+      .numtxt { fill: #14171c; font-size: 14px; font-weight: 700; }
+      .title { fill: #f0f2f5; font-size: 16px; font-weight: 600; }
+      .sub { fill: #9aa3ae; font-size: 13px; }
+      .flow { stroke: #f2b544; stroke-width: 2; fill: none; }
+      .loop { stroke: #f2b544; stroke-width: 2; fill: none; stroke-dasharray: 5 5; }
+      .note { fill: #f2b544; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="920" height="330" rx="16" fill="#0b0d10"/>
+
+  <!-- Row 1: left to right -->
+  <g>
+    <rect class="card" x="40" y="36" width="250" height="92" rx="12"/>
+    <circle class="num" cx="68" cy="64" r="13"/><text class="numtxt" x="68" y="69" text-anchor="middle">1</text>
+    <text class="title" x="92" y="69">Today picks one</text>
+    <text class="sub" x="60" y="100">The easiest challenge you</text>
+    <text class="sub" x="60" y="117">haven't passed yet</text>
+  </g>
+  <g>
+    <rect class="card" x="335" y="36" width="250" height="92" rx="12"/>
+    <circle class="num" cx="363" cy="64" r="13"/><text class="numtxt" x="363" y="69" text-anchor="middle">2</text>
+    <text class="title" x="387" y="69">Learn, then predict</text>
+    <text class="sub" x="355" y="100">A short lesson, then guess what</text>
+    <text class="sub" x="355" y="117">some code does before you see it</text>
+  </g>
+  <g>
+    <rect class="card" x="630" y="36" width="250" height="92" rx="12"/>
+    <circle class="num" cx="658" cy="64" r="13"/><text class="numtxt" x="658" y="69" text-anchor="middle">3</text>
+    <text class="title" x="682" y="69">Write the code</text>
+    <text class="sub" x="650" y="100">In VS Code (or the browser),</text>
+    <text class="sub" x="650" y="117">with hints if you get stuck</text>
+  </g>
+
+  <!-- Row 2: right to left -->
+  <g>
+    <rect class="card" x="630" y="200" width="250" height="92" rx="12"/>
+    <circle class="num" cx="658" cy="228" r="13"/><text class="numtxt" x="658" y="233" text-anchor="middle">4</text>
+    <text class="title" x="682" y="233">Run the tests</text>
+    <text class="sub" x="650" y="264">As often as you like. Failures</text>
+    <text class="sub" x="650" y="281">tell you what went wrong</text>
+  </g>
+  <g>
+    <rect class="card" x="335" y="200" width="250" height="92" rx="12"/>
+    <circle class="num" cx="363" cy="228" r="13"/><text class="numtxt" x="363" y="233" text-anchor="middle">5</text>
+    <text class="title" x="387" y="233">Submit and explain</text>
+    <text class="sub" x="355" y="264">Hidden tests check edge cases;</text>
+    <text class="sub" x="355" y="281">you say why it works</text>
+  </g>
+  <g>
+    <rect class="card" x="40" y="200" width="250" height="92" rx="12"/>
+    <circle class="num" cx="68" cy="228" r="13"/><text class="numtxt" x="68" y="233" text-anchor="middle">6</text>
+    <text class="title" x="92" y="233">Progress is recorded</text>
+    <text class="sub" x="60" y="264">Hints, time and passes become</text>
+    <text class="sub" x="60" y="281">evidence of what you can do</text>
+  </g>
+
+  <!-- Arrows -->
+  <line class="flow" x1="292" y1="82" x2="331" y2="82" marker-end="url(#arrow)"/>
+  <line class="flow" x1="587" y1="82" x2="626" y2="82" marker-end="url(#arrow)"/>
+  <path class="flow" d="M755,130 L755,196" marker-end="url(#arrow)"/>
+  <line class="flow" x1="628" y1="246" x2="589" y2="246" marker-end="url(#arrow)"/>
+  <line class="flow" x1="333" y1="246" x2="294" y2="246" marker-end="url(#arrow)"/>
+  <path class="loop" d="M165,198 L165,132" marker-end="url(#arrow)"/>
+  <text class="note" x="178" y="170">NEXT CHALLENGE</text>
+</svg>
