@@ -1,0 +1,159 @@
+id: first-route
+title: Your first routes
+objective: Start a server that answers two URLs with JSON, and says "not found" properly for everything else.
+dependsOn:
+  - server-framework
+startsApp: true
+lesson:
+  concept: "An HTTP response has three parts: a status code, headers and a body"
+  realWorldProblem: >
+    Your reading-list page will soon ask the server "what books are there?". The page is code, not a
+    person, so it can't read a friendly sentence like "here are your books". It needs an answer in a
+    fixed shape that code can check: did it work, what kind of data is this, and the data itself.
+  whyItExists: >
+    HTTP is the agreement every browser and server follow, so that any page can talk to any server.
+    Every answer (a "response") starts with a status code, a number that says how it went, so code
+    can decide what to do without reading the words. 200 means OK, 404 means "there's nothing at
+    that URL", 500 means the server broke.
+  howItWorks: >
+    A request names a method (GET means "give me") and a path (/api/books). The server sends back a
+    response with: (1) a status code; (2) headers, labels about the answer, the most important being
+    Content-Type, which says what the body is ("application/json" for JSON data); and (3) the body,
+    the data itself. JSON is text that looks like a JavaScript array or object, such as [] or
+    {"ok":true}. Your server decides all three parts for every request. If it doesn't set a status,
+    the default is 200, even when the body says something went wrong.
+  example:
+    code: |
+      GET /api/stops/12/next-bus HTTP/1.1
+      Host: 127.0.0.1:4100
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+
+      {"stop":12,"minutes":4}
+    explanation: >
+      A bus-times app asks when the next bus reaches stop 12. The first block is the request: method
+      GET, path /api/stops/12/next-bus. The second block is the response: status 200 (it worked), a
+      Content-Type header saying the body is JSON, then a blank line, then the body. The page can now
+      do data.minutes and get 4.
+  predict:
+    code: |
+      GET /api/nothing-here HTTP/1.1
+
+      HTTP/1.1 200 OK
+      Content-Type: text/plain
+
+      Sorry, there's nothing here.
+    question: >
+      A page sends this request and checks the answer with `if (response.ok)`. (response.ok is true
+      when the status is between 200 and 299.) Is response.ok true or false?
+    answer: "true"
+    why: >
+      Code looks at the status code, not the words. The body says "nothing here", but the status is
+      200, so as far as the page knows it worked. The server should have sent 404. This is the most
+      common mistake in a first server.
+  commonMistake: >
+    Sending an error message with status 200, or sending JSON without saying so in Content-Type.
+    Both "work" when you look in a browser, but break the code that reads the answer.
+task: >
+  Your reading list needs a server before it can store anything. For now it has no books, but other
+  code will start talking to it straight away, so the answers must already be in the right shape.
+  Create the server in your project folder and give it two routes: a health check (so you, and the
+  1% Engineer checks, can tell it's running) and the list of books, which is empty for now.
+requirements:
+  - package.json has a "start" script that starts your server (for example "node server.js")
+  - The server listens on the port number in process.env.PORT
+  - GET /api/health answers with status 200 and the JSON {"ok":true}
+  - GET /api/books answers with status 200 and a JSON array, empty for now
+  - Both answers have the header Content-Type application/json
+  - Any other path answers with status 404
+hints:
+  - Which three parts does every answer need? Check each requirement against those three.
+  - Start with /api/health only. Run the checks, then add /api/books, then think about every other URL.
+  - If "unknown paths are 404" fails, look at what your server sends when no route matches. Does it set a status at all?
+  - "Your server needs: a way to run code per path, a status for each answer, a JSON body, and a final \"else\" that answers ___."
+variants:
+  node-http:
+    notes: >
+      With node:http you get one function that runs for every request. Inside it, req.method and
+      req.url tell you what was asked for, and you choose the answer with
+      res.writeHead(status, headers) followed by res.end(body). The body must be a string, so turn
+      arrays and objects into JSON text with JSON.stringify.
+    example:
+      code: |
+        import { createServer } from "node:http";
+
+        createServer((req, res) => {
+          if (req.method === "GET" && req.url === "/api/stops/12/next-bus") {
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ stop: 12, minutes: 4 }));
+          } else {
+            res.writeHead(404, { "content-type": "text/plain" });
+            res.end("Not found");
+          }
+        }).listen(process.env.PORT);
+      explanation: >
+        One function handles every request. The if checks the method and path; the else is what
+        every other URL gets. listen(process.env.PORT) uses the port the runner (or a hosting
+        platform) gives you, instead of a number you picked.
+    hints:
+      - Which three parts does every answer need? Check each requirement against those three.
+      - Your request handler runs for every URL. Use if / else if on req.method and req.url to pick an answer.
+      - res.end() on its own sends status 200. Call res.writeHead(status, headers) first, in every branch, including the last else.
+      - "if (req.method === \"GET\" && req.url === \"/api/health\") { res.writeHead(___, { \"content-type\": ___ }); res.end(JSON.stringify(___)); } else if ... else { ___ }"
+  express:
+    notes: >
+      With Express you register one function per route: app.get(path, handler). Express matches the
+      URL for you. res.json(value) turns the value into JSON and sets Content-Type for you. When no
+      route matches, Express already answers 404, so you don't need an else.
+    example:
+      code: |
+        import express from "express";
+
+        const app = express();
+
+        app.get("/api/stops/12/next-bus", (req, res) => {
+          res.json({ stop: 12, minutes: 4 });
+        });
+
+        app.listen(process.env.PORT);
+      explanation: >
+        app.get says "when a GET request arrives for this path, run this function". res.json sends
+        status 200, the JSON header and the body in one go. Any other URL gets Express's built-in 404.
+    hints:
+      - Which three parts does every answer need? Check each requirement against those three.
+      - Express needs installing in your project first (npm install express). Then one app.get(...) per route.
+      - res.send() with an array guesses the type for you; res.json() says exactly what you mean. Which one sets application/json every time?
+      - "app.get(\"/api/health\", (req, res) => { res.json(___); }); app.get(\"/api/books\", ___); app.listen(___);"
+  fastify:
+    notes: >
+      With Fastify you register one function per route: app.get(path, handler). Whatever object or
+      array your handler returns is sent as JSON with the right Content-Type. Unknown URLs get a 404
+      automatically. Fastify listens with app.listen({ port }), and the port must be a number.
+    example:
+      code: |
+        import Fastify from "fastify";
+
+        const app = Fastify();
+
+        app.get("/api/stops/12/next-bus", async () => {
+          return { stop: 12, minutes: 4 };
+        });
+
+        await app.listen({ port: Number(process.env.PORT) });
+      explanation: >
+        The handler is async and simply returns the data; Fastify turns it into a JSON response with
+        status 200. process.env values are always strings, so Number(...) turns "4123" into 4123.
+    hints:
+      - Which three parts does every answer need? Check each requirement against those three.
+      - Fastify needs installing in your project first (npm install fastify). Then one app.get(...) per route, returning the data.
+      - If the app starts but nothing answers, check what you pass to listen. Fastify wants an object with a numeric port.
+      - "app.get(\"/api/health\", async () => ___); app.get(\"/api/books\", async () => ___); await app.listen({ port: ___ });"
+commonMistakes:
+  - Answering unknown paths with status 200 (the body says "not found", the status says "fine")
+  - Sending JSON with Content-Type text/plain or text/html
+  - Listening on a fixed port like 3000 instead of process.env.PORT
+  - "In Express, sending JSON text with res.send(\"[]\"): Express labels a string as text/html"
+explanationCheckpoint: >
+  Explain what your server does when a request arrives for /api/books and when one arrives for
+  /api/whatever. Why does the status code matter even though a person could read the body?

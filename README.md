@@ -195,12 +195,13 @@ Your build tasks are in [docs/TASKS.md](docs/TASKS.md).
 | Path | What's there |
 |---|---|
 | `apps/web` | The web app (Today, Challenges, Skills, Journal) |
-| `apps/server` | The API, the sandboxed test runner and the database |
+| `apps/server` | The API, the sandboxed test runner, the project runner and the database |
 | `apps/vscode` | The VS Code extension |
 | `packages/contracts` | Shared schemas and types |
 | `packages/core` | The rules: `independence.js` (worked example), `mastery.js` and `selector.js` (your tasks) |
 | `content/skills` | The map of skills to learn |
 | `content/challenges` | One folder per challenge |
+| `content/projects` | Build by Learning projects: decisions, steps, behaviour checks, references ([plan](docs/BUILD-BY-LEARNING.md)) |
 | `.claude/skills/daily-challenge` | The `/daily-challenge` generator |
 | `scripts/autostart.mjs` | Starts the app at login (macOS) |
 

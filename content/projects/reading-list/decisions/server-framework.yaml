@@ -1,0 +1,94 @@
+id: server-framework
+title: How will you write your server?
+problem: >
+  A web page on its own can't remember anything or share data between people. For that it needs a
+  server: a program that is always running, waiting for requests like "give me the list of books",
+  and sending back answers. Node.js can already do this. The question is how much help you want
+  with it. Every option below produces the same thing from the outside: a server that answers HTTP
+  requests. They differ in how much you write yourself, and in what that teaches you.
+criteria:
+  - id: fundamentals
+    label: See how it really works
+    description: You write the parts a library would normally hide, so nothing is magic.
+  - id: few-new-ideas
+    label: Fewest new ideas right now
+    description: How little you need to learn before your first route works.
+  - id: jobs
+    label: What you'll meet at work
+    description: How likely you are to see it in real job listings and codebases.
+  - id: grows-well
+    label: Stays tidy as it grows
+    description: How well it copes once there are dozens of routes, validation and errors.
+options:
+  - id: node-http
+    name: Node's built-in http module
+    summary: >
+      No library at all. Node gives you every request as an object, and you decide what to send back
+      by checking the method and the URL yourself.
+    strengths:
+      - Nothing to install, and nothing is hidden from you
+      - Every later tool (Express, Fastify) is built on exactly this, so it makes them easy to learn later
+    costs:
+      - You write the routing yourself with if/else, which gets long as the app grows
+      - Reading a request body (for adding a book) takes more code than with a library
+    whenProsChooseIt: >
+      For tiny services with one or two routes, or when they want no dependencies at all. Rarely for
+      a whole app.
+    newIdeas:
+      - HTTP requests and responses
+      - status codes
+      - headers
+    relatedSkills:
+      - js.conditionals
+      - js.functions
+    fit: { fundamentals: 5, few-new-ideas: 4, jobs: 2, grows-well: 1 }
+  - id: express
+    name: Express
+    summary: >
+      The most widely used Node server library. You register a function for each route
+      ("when someone GETs /api/books, run this") and Express does the matching for you.
+    strengths:
+      - By far the most tutorials, answers and examples online
+      - Short, readable route code
+    costs:
+      - One extra idea to learn, middleware, and it's easy to misunderstand at first
+      - Hides some of what's happening, so errors can be harder to trace
+    whenProsChooseIt: >
+      When they want something familiar to every Node developer on the team, and a huge choice of
+      add-ons. It's the default in a very large number of existing codebases.
+    newIdeas:
+      - HTTP requests and responses
+      - status codes
+      - routes
+      - middleware
+    relatedSkills:
+      - js.functions
+    fit: { fundamentals: 3, few-new-ideas: 4, jobs: 5, grows-well: 3 }
+  - id: fastify
+    name: Fastify
+    summary: >
+      A newer Node server library, similar to Express but built around plugins and schemas, which
+      describe what a request and response should look like.
+    strengths:
+      - Turns objects you return into JSON for you, with the right headers
+      - Schemas and plugins keep a big app organised, and catch bad input early
+    costs:
+      - Fewer beginner tutorials than Express
+      - Plugins and schemas are extra ideas you'll meet sooner
+    whenProsChooseIt: >
+      For new services where speed and structure matter, especially APIs that validate a lot of input.
+      (The 1% Engineer server itself uses Fastify.)
+    newIdeas:
+      - HTTP requests and responses
+      - status codes
+      - routes
+      - plugins
+      - async handlers
+    relatedSkills:
+      - js.functions
+      - js.objects
+    fit: { fundamentals: 3, few-new-ideas: 3, jobs: 3, grows-well: 5 }
+costOfChangingLater: >
+  Medium. Your app's behaviour (its URLs and answers) stays the same, so the checks don't change, but
+  every route handler gets rewritten. Changing early, before the storage milestone, costs about one
+  evening; changing at the end costs more.

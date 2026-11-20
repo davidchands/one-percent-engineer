@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "content/projects"
 
 # esbuild (used by tsx and vite) needs its install script to fetch its binary.
 allowBuilds:

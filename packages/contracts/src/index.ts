@@ -276,4 +276,108 @@ export const JournalEntry = NewJournalEntry.extend({
 });
 export type JournalEntry = z.infer<typeof JournalEntry>;
 
+/* ------------------------------------------------------------------ */
+/* Build by Learning: projects (content/projects/<id>/)                */
+/* See docs/BUILD-BY-LEARNING.md                                       */
+/* ------------------------------------------------------------------ */
+
+const Slug = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "ids are kebab-case, like first-route");
+
+/** One choice on a decision card. Nothing here says "pick this": the learner decides. */
+export const DecisionOption = z.object({
+  id: Slug,
+  name: z.string(),
+  summary: z.string().describe("What it is, in one or two plain sentences"),
+  strengths: z.array(z.string()).min(1),
+  costs: z.array(z.string()).min(1),
+  whenProsChooseIt: z.string(),
+  /** New ideas this option makes you learn, as plain labels ("middleware"). */
+  newIdeas: z.array(z.string()),
+  /** Skill ids that help with this option; compared against the learner's evidence. */
+  relatedSkills: z.array(z.string()).default([]),
+  /** How well this option fits each criterion, 1 (poorly) to 5 (very well). Keys are criterion ids. */
+  fit: z.record(z.string(), z.number().int().min(1).max(5)),
+});
+export type DecisionOption = z.infer<typeof DecisionOption>;
+
+export const Decision = z.object({
+  id: Slug,
+  title: z.string(),
+  /** The real problem that forces this choice, before any option is named. */
+  problem: z.string(),
+  /** What a sensible engineer weighs. The learner sets how much each one matters to them. */
+  criteria: z.array(z.object({ id: Slug, label: z.string(), description: z.string() })).min(2),
+  options: z.array(DecisionOption).min(2).max(4),
+  /** What it costs to change your mind later, so the choice feels as heavy as it is. */
+  costOfChangingLater: z.string(),
+});
+export type Decision = z.infer<typeof Decision>;
+
+/** Per-option extras on a step: the same task, explained for the stack the learner chose. */
+export const StepVariant = z.object({
+  notes: z.string().describe("How this step works with this option"),
+  example: z.object({ code: z.string(), explanation: z.string() }).optional(),
+  /** Replaces the step's hints for this option. Same rules: gentle first, never the full solution. */
+  hints: z.array(z.string()).min(3).optional(),
+});
+export type StepVariant = z.infer<typeof StepVariant>;
+
+export const ProjectStep = z.object({
+  id: Slug,
+  title: z.string(),
+  objective: z.string(),
+  skills: z.array(z.string()).default([]),
+  lesson: Lesson.optional(),
+  /** What to build, as a situation in the project ("readers need to see the list"). */
+  task: z.string(),
+  requirements: z.array(z.string()).min(1),
+  /** Decisions this step's notes and references depend on, in order. Must come earlier in the project. */
+  dependsOn: z.array(Slug).default([]),
+  /** Does the runner start the app before the checks? False for steps that only check files. */
+  startsApp: z.boolean().default(true),
+  hints: z.array(z.string()).min(3),
+  /** Keyed by option id of a decision in dependsOn. */
+  variants: z.record(z.string(), StepVariant).default({}),
+  commonMistakes: z.array(z.string()),
+  explanationCheckpoint: z.string(),
+});
+export type ProjectStep = z.infer<typeof ProjectStep>;
+
+export const MilestoneItem = z.union([
+  z.object({ step: Slug }).strict(),
+  z.object({ decision: Slug }).strict(),
+  z.object({ checkpoint: z.string() }).strict(),
+]);
+export type MilestoneItem = z.infer<typeof MilestoneItem>;
+
+export const Milestone = z.object({
+  id: Slug,
+  title: z.string(),
+  goal: z.string().describe("What works at the end of this milestone, from the user's point of view"),
+  items: z.array(MilestoneItem).min(1),
+});
+export type Milestone = z.infer<typeof Milestone>;
+
+export const ProjectMeta = z.object({
+  id: Slug,
+  title: z.string(),
+  brief: z.string().describe("What the app is and who it's for, in plain words"),
+  whatYouBuild: z.array(z.string()).min(1),
+  /** Skills that make this project comfortable. Not a hard lock (that's decided by the app). */
+  prerequisites: z.array(z.string()).default([]),
+  milestones: z.array(Milestone).min(1),
+});
+export type ProjectMeta = z.infer<typeof ProjectMeta>;
+
+/** Why the runner couldn't get as far as running the checks, if it couldn't. */
+export const AppStartup = z.enum(["not_needed", "ok", "no_start_script", "exited", "timeout"]);
+export type AppStartup = z.infer<typeof AppStartup>;
+
+export const ProjectCheckResult = TestRunResult.extend({
+  startup: AppStartup,
+  /** The last part of what the app printed. Its own errors are the best clue when it won't start. */
+  appOutput: z.string(),
+});
+export type ProjectCheckResult = z.infer<typeof ProjectCheckResult>;
+
 export type * from "./api.ts";
