@@ -2,7 +2,17 @@
  * Response shapes of the local HTTP API, shared by every client (web app, VS Code extension,
  * and later the AI chat). Plain interfaces: the server produces them, clients trust them.
  */
-import type { Independence, JournalEntry, Rationale, SkillNode, SkillState, TestRunResult } from "./index.ts";
+import type {
+  Decision,
+  Independence,
+  JournalEntry,
+  Lesson,
+  ProjectCheckResult,
+  Rationale,
+  SkillNode,
+  SkillState,
+  TestRunResult,
+} from "./index.ts";
 
 export interface TodayResponse {
   date: string;
@@ -85,4 +95,108 @@ export interface SubmitResponse {
   allPassed: boolean;
   independence: Independence;
   attempt: AttemptResponse;
+}
+
+/* ------------------------------------------------------------------ */
+/* Build by Learning                                                   */
+/* ------------------------------------------------------------------ */
+
+export interface ProjectSummary {
+  id: string;
+  title: string;
+  brief: string;
+  started: boolean;
+  folder: string | null;
+  progress: { stepsPassed: number; steps: number; decisionsMade: number; decisions: number };
+}
+
+export type StepStatus = "blocked" | "ready" | "in_progress" | "passed" | "redo";
+
+export type RoadmapItem =
+  | { kind: "decision"; id: string; title: string; chosen: { optionId: string; name: string } | null }
+  | { kind: "step"; id: string; title: string; status: StepStatus; blockedBy: string[] }
+  | { kind: "checkpoint"; prompt: string };
+
+export interface ProjectView {
+  id: string;
+  title: string;
+  brief: string;
+  whatYouBuild: string[];
+  started: boolean;
+  folder: string | null;
+  /** Where the folder will be created if you start now. */
+  suggestedFolder: string;
+  /** Not a lock: a heads-up about ideas you haven't practised in a challenge yet. */
+  prerequisites: { id: string; name: string; practised: boolean }[];
+  milestones: { id: string; title: string; goal: string; items: RoadmapItem[] }[];
+  /** The first thing on the roadmap that isn't done. */
+  next: { kind: "decision" | "step"; id: string } | null;
+}
+
+export interface DecisionChoice {
+  optionId: string;
+  reason: string;
+  weights: Record<string, number>;
+  decidedAt: string;
+}
+
+export interface DecisionView {
+  projectId: string;
+  /** Position in the project, used for the decision record's file name (0001-…). */
+  number: number;
+  decision: Decision;
+  chosen: DecisionChoice | null;
+  history: DecisionChoice[];
+  /** Per option: which of its related skills you've practised in challenges, and which not yet. */
+  readiness: Record<string, { practised: string[]; notYet: string[] }>;
+  /** Steps built on this decision, and whether you've already passed them with your current choice. */
+  affectedSteps: { id: string; title: string; passed: boolean }[];
+  /** The decision record file in your project, once you've decided. */
+  recordPath: string | null;
+}
+
+export interface StepAttemptView {
+  id: number;
+  stepId: string;
+  status: string;
+  independence: Independence | null;
+  optionsKey: string;
+  startedAt: string;
+  endedAt: string | null;
+  hints: string[];
+  hintCount: number;
+  checkRuns: number;
+  lastCheck: ProjectCheckResult | null;
+  lastSubmission: { explanation: string; results: ProjectCheckResult; createdAt: string } | null;
+  /** Only after you've chosen to look. Viewing it is recorded. */
+  reference: { path: string; content: string }[] | null;
+}
+
+export interface StepView {
+  projectId: string;
+  id: string;
+  title: string;
+  objective: string;
+  lesson: Lesson | null;
+  task: string;
+  requirements: string[];
+  /** Notes for the options you chose, e.g. how this step works with Express. */
+  notes: { decisionTitle: string; optionName: string; notes: string; example: { code: string; explanation: string } | null }[];
+  commonMistakes: string[];
+  explanationCheckpoint: string;
+  startsApp: boolean;
+  acceptanceTests: string;
+  hintCount: number;
+  status: StepStatus;
+  /** Decisions you need to make before you can start this step. */
+  blockedBy: { id: string; title: string }[];
+  folder: string | null;
+  attempt: StepAttemptView | null;
+}
+
+export interface StepSubmitResponse {
+  results: ProjectCheckResult;
+  allPassed: boolean;
+  independence: Independence;
+  attempt: StepAttemptView;
 }

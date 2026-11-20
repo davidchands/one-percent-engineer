@@ -8,10 +8,11 @@ import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z, ZodError } from "zod";
-import { NewEvent, NewJournalEntry, RunRequest, SubmitRequest } from "@1pe/contracts";
+import { DecideRequest, NewEvent, NewJournalEntry, RunRequest, StartProjectRequest, StepSubmitRequest, SubmitRequest } from "@1pe/contracts";
 import { openDb } from "./db.ts";
 import { loadContent } from "./content.ts";
 import * as svc from "./services.ts";
+import * as projects from "./projects.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const PORT = Number(process.env.PORT ?? 4100);
@@ -63,6 +64,40 @@ export function buildApp(ctx: svc.Ctx) {
     svc.updateJournal(ctx, idParam.parse(req.params).id, NewJournalEntry.parse(req.body)),
   );
 
+  // Build by Learning (docs/BUILD-BY-LEARNING.md)
+  const projectParam = z.object({ id: z.string() });
+  const itemParam = z.object({ id: z.string(), item: z.string() });
+  app.get("/api/projects", async () => projects.listProjects(ctx));
+  app.get("/api/projects/:id", async (req) => projects.getProjectView(ctx, projectParam.parse(req.params).id));
+  app.post("/api/projects/:id/start", async (req) =>
+    projects.startProject(ctx, projectParam.parse(req.params).id, StartProjectRequest.parse(req.body ?? {}).folder),
+  );
+  app.get("/api/projects/:id/decisions/:item", async (req) => {
+    const p = itemParam.parse(req.params);
+    return projects.getDecisionView(ctx, p.id, p.item);
+  });
+  app.post("/api/projects/:id/decisions/:item", async (req) => {
+    const p = itemParam.parse(req.params);
+    return projects.decide(ctx, p.id, p.item, DecideRequest.parse(req.body));
+  });
+  app.get("/api/projects/:id/steps/:item", async (req) => {
+    const p = itemParam.parse(req.params);
+    return projects.getStepView(ctx, p.id, p.item);
+  });
+  app.post("/api/projects/:id/steps/:item/attempts", async (req) => {
+    const p = itemParam.parse(req.params);
+    return projects.startStepAttempt(ctx, p.id, p.item);
+  });
+  app.get("/api/step-attempts/:id", async (req) => projects.stepAttemptView(ctx, idParam.parse(req.params).id));
+  app.post("/api/step-attempts/:id/hints", async (req) => projects.requestStepHint(ctx, idParam.parse(req.params).id));
+  app.post("/api/step-attempts/:id/run", async (req) => projects.runStepChecks(ctx, idParam.parse(req.params).id));
+  app.post("/api/step-attempts/:id/submit", async (req) =>
+    projects.submitStep(ctx, idParam.parse(req.params).id, StepSubmitRequest.parse(req.body)),
+  );
+  app.post("/api/step-attempts/:id/reference", async (req) =>
+    projects.revealReference(ctx, idParam.parse(req.params).id, z.object({ confirm: z.boolean() }).parse(req.body).confirm),
+  );
+
   // Serve the built web app if it exists. In development, Vite serves it on :5173 instead.
   if (existsSync(WEB_DIST)) {
     app.register(fastifyStatic, { root: WEB_DIST, prefix: "/" });
@@ -78,9 +113,9 @@ export function buildApp(ctx: svc.Ctx) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const content = loadContent();
   const db = openDb(DB_PATH);
-  const app = buildApp({ db, content });
+  const app = buildApp({ db, content, projectsDir: process.env.PROJECTS_DIR });
   await app.listen({ host: "127.0.0.1", port: PORT });
   console.log(
-    `1% Engineer server on http://127.0.0.1:${PORT}  ·  ${content.skills.size} skills, ${content.challenges.size} challenges  ·  db ${DB_PATH}`,
+    `1% Engineer server on http://127.0.0.1:${PORT}  ·  ${content.skills.size} skills, ${content.challenges.size} challenges, ${content.projects.size} project(s)  ·  db ${DB_PATH}`,
   );
 }

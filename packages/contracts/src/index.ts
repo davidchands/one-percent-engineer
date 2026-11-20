@@ -380,4 +380,25 @@ export const ProjectCheckResult = TestRunResult.extend({
 });
 export type ProjectCheckResult = z.infer<typeof ProjectCheckResult>;
 
+export const StartProjectRequest = z.object({
+  /** Absolute path for your project. Defaults to ~/Documents/1pe-projects/<project-id>. */
+  folder: z.string().startsWith("/", "Use an absolute path, like /Users/you/Documents/reading-list").optional(),
+});
+export type StartProjectRequest = z.infer<typeof StartProjectRequest>;
+
+export const DecideRequest = z.object({
+  optionId: z.string(),
+  /** Required: picking without a reason is guessing, not deciding. */
+  reason: z.string().trim().min(30, "Say why in a sentence or two: what made this option fit you?"),
+  /** How much each criterion matters to you: 0 (not at all) to 3 (a lot). */
+  weights: z.record(z.string(), z.number().int().min(0).max(3)).default({}),
+});
+export type DecideRequest = z.infer<typeof DecideRequest>;
+
+export const StepSubmitRequest = z.object({
+  explanation: z.string().min(40, "Explain your reasoning in at least a few sentences."),
+  usedOutsideHelp: z.boolean(),
+});
+export type StepSubmitRequest = z.infer<typeof StepSubmitRequest>;
+
 export type * from "./api.ts";

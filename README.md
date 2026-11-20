@@ -86,6 +86,16 @@ Then open your practice folder (`~/Documents/1pe-practice`) in VS Code and click
 5. When all tests pass, explain *why* your code works in a few sentences, then **Submit**.
 6. Click **Next** to go straight to the next challenge.
 
+## Build a real app
+
+The **Build** tab takes you through building a full-stack app, one step at a time. When the project
+needs a technology choice (which server library? which database?), it teaches you the options and
+their trade-offs, and **you decide**, with your reasons saved in your project. Then you write the code
+in your own project folder, and **Run checks** starts your app and tests what it does.
+
+It's early: the first project, a reading list, currently has its first milestone. More details:
+[docs/BUILD-BY-LEARNING.md](docs/BUILD-BY-LEARNING.md).
+
 ## New challenges on demand
 
 With [Claude Code](https://claude.com/claude-code), type:
@@ -194,7 +204,7 @@ Your build tasks are in [docs/TASKS.md](docs/TASKS.md).
 
 | Path | What's there |
 |---|---|
-| `apps/web` | The web app (Today, Challenges, Skills, Journal) |
+| `apps/web` | The web app (Today, Challenges, Build, Skills, Journal) |
 | `apps/server` | The API, the sandboxed test runner, the project runner and the database |
 | `apps/vscode` | The VS Code extension |
 | `packages/contracts` | Shared schemas and types |

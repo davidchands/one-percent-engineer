@@ -85,7 +85,7 @@ export function ChallengePage({ id }: { id: string }) {
  * The lesson comes first: problem → why the concept exists → how it works → example → your prediction.
  * The prediction's answer stays hidden until you've committed to a guess.
  */
-function LessonCard({ lesson, startOpen }: { lesson: Lesson; startOpen: boolean }) {
+export function LessonCard({ lesson, startOpen }: { lesson: Lesson; startOpen: boolean }) {
   const [guess, setGuess] = useState("");
   const [revealed, setRevealed] = useState(false);
   return (
@@ -146,7 +146,7 @@ function LessonCard({ lesson, startOpen }: { lesson: Lesson; startOpen: boolean 
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
       <Label>{title}</Label>
@@ -159,7 +159,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
  * Renders problem text from YAML: blank lines separate paragraphs, wrapped lines are joined,
  * and indented lines (signatures, shapes) are shown as code.
  */
-function ProblemText({ text }: { text: string }) {
+export function ProblemText({ text }: { text: string }) {
   return (
     <div className="space-y-3 text-sm leading-relaxed">
       {text
@@ -202,7 +202,7 @@ function ProblemText({ text }: { text: string }) {
   );
 }
 
-function List({ items }: { items: string[] }) {
+export function List({ items }: { items: string[] }) {
   return (
     <ol className="list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
       {items.map((i) => (
@@ -491,7 +491,7 @@ function Workspace({
   );
 }
 
-function Results({ run }: { run: TestRunResult }) {
+export function Results({ run }: { run: TestRunResult }) {
   return (
     <Card className="p-5">
       <div className="flex items-center gap-3">

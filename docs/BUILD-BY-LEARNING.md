@@ -4,7 +4,8 @@ Build one real full-stack app, one milestone at a time, learning each idea as yo
 When the project needs a technology choice, the app **teaches you the options and you decide**.
 It never chooses for you.
 
-Status: **PR 1 (foundation) is in progress.** The rest of this page is the approved plan.
+Status: **PR 1 (foundation) and PR 2 (server and the Build tab) are done.** Next is PR 3, the full
+reading-list project. The rest of this page is the approved plan.
 
 ## How a project works
 
@@ -102,5 +103,6 @@ access. It only runs your own project on your own machine.
 
 - **First project:** a reading list (books you want to read, are reading, have read).
 - **Skill nodes:** PR 1 adds none. New `web.*` / `data.*` nodes are decided before PR 3.
-- **Unlocking:** decided in PR 2; the default is "open, with a warning about new ideas".
+- **Unlocking:** projects are open, with a heads-up listing prerequisite skills you haven't
+  practised in a challenge yet.
 - **Frontend checks:** lightweight (files and HTML structure) first; a real browser later if needed.
