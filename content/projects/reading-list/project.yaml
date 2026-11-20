@@ -1,0 +1,26 @@
+id: reading-list
+title: Reading list
+brief: >
+  A small web app for keeping track of books: the ones you want to read, the one you're reading,
+  and the ones you've finished. You'll build every part of it yourself: the page people see, the
+  server behind it, and somewhere to keep the data so it's still there tomorrow.
+whatYouBuild:
+  - A web page that lists your books and lets you add one
+  - A server with an API (a set of URLs your page talks to)
+  - Storage, so your list survives a restart
+prerequisites:
+  - js.functions
+  - js.objects
+  - js.arrays
+# Draft: PR 1 proves the format with the server milestone only. The earlier milestones (the page,
+# interactivity) and the later ones (storage, connecting the page, shipping) arrive in PR 3.
+milestones:
+  - id: a-server
+    title: A server that answers
+    goal: When you visit http://127.0.0.1:<port>/api/books you get back your (empty) list of books as JSON.
+    items:
+      - decision: server-framework
+      - step: first-route
+      - checkpoint: >
+          Your browser asks for /api/books. Describe, step by step, what happens between that request
+          leaving the browser and the [] arriving back.

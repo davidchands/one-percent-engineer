@@ -1,0 +1,11 @@
+{
+  "name": "@1pe/project-references",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Libraries the Build by Learning reference solutions use. The validator copies each reference snapshot into .runs/ here, so these resolve. Your own projects install their own.",
+  "dependencies": {
+    "express": "^5.1.0",
+    "fastify": "^5.2.0"
+  }
+}
