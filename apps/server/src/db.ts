@@ -79,6 +79,60 @@ const MIGRATIONS: string[] = [
   -- Full-text search over the journal. 'body' is all fields flattened to text.
   CREATE VIRTUAL TABLE journal_fts USING fts5(title, body, content='', contentless_delete=1);
   `,
+  /* 2: Build by Learning (docs/BUILD-BY-LEARNING.md) */ `
+  -- One row per project you've started. project_id is the content id (e.g. reading-list).
+  CREATE TABLE projects (
+    id          INTEGER PRIMARY KEY,
+    project_id  TEXT NOT NULL UNIQUE,
+    folder      TEXT NOT NULL,
+    started_at  TEXT NOT NULL
+  );
+
+  -- Append-only, like evidence: your current choice is the latest row per decision,
+  -- and changing your mind keeps the history.
+  CREATE TABLE project_decisions (
+    id           INTEGER PRIMARY KEY,
+    project_row  INTEGER NOT NULL REFERENCES projects(id),
+    decision_id  TEXT NOT NULL,
+    option_id    TEXT NOT NULL,
+    reason       TEXT NOT NULL,
+    weights      TEXT NOT NULL DEFAULT '{}',
+    decided_at   TEXT NOT NULL
+  );
+  CREATE INDEX project_decisions_lookup ON project_decisions(project_row, decision_id, id);
+
+  -- Step attempts mirror challenge attempts. options_key records the choices the step was built
+  -- with ("express"), so a pass made with one choice doesn't count after you change your mind.
+  CREATE TABLE step_attempts (
+    id            INTEGER PRIMARY KEY,
+    project_row   INTEGER NOT NULL REFERENCES projects(id),
+    step_id       TEXT NOT NULL,
+    options_key   TEXT NOT NULL,
+    started_at    TEXT NOT NULL,
+    ended_at      TEXT,
+    status        TEXT NOT NULL DEFAULT 'in_progress',
+    independence  TEXT
+  );
+  CREATE INDEX step_attempts_lookup ON step_attempts(project_row, step_id);
+
+  CREATE TABLE step_events (
+    id          INTEGER PRIMARY KEY,
+    attempt_id  INTEGER NOT NULL REFERENCES step_attempts(id),
+    ts          TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    payload     TEXT NOT NULL DEFAULT '{}'
+  );
+  CREATE INDEX step_events_attempt ON step_events(attempt_id, ts);
+
+  CREATE TABLE step_submissions (
+    id                 INTEGER PRIMARY KEY,
+    attempt_id         INTEGER NOT NULL REFERENCES step_attempts(id),
+    created_at         TEXT NOT NULL,
+    explanation        TEXT NOT NULL,
+    used_outside_help  INTEGER NOT NULL,
+    results            TEXT NOT NULL
+  );
+  `,
 ];
 
 export type DB = DatabaseSync;

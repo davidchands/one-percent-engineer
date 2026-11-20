@@ -5,6 +5,9 @@ import { ChallengePage } from "./pages/Challenge.tsx";
 import { ChallengesPage } from "./pages/Challenges.tsx";
 import { SkillsPage } from "./pages/Skills.tsx";
 import { JournalPage } from "./pages/Journal.tsx";
+import { BuildPage, ProjectPage } from "./pages/Build.tsx";
+import { DecisionPage } from "./pages/Decision.tsx";
+import { StepPage } from "./pages/Step.tsx";
 
 /** Tiny hash router: #/path?query. Enough for a local tool; no dependency to learn yet. */
 function useHashRoute() {
@@ -32,6 +35,7 @@ export const go = (to: string) => {
 const NAV = [
   { to: "/", label: "Today" },
   { to: "/challenges", label: "Challenges" },
+  { to: "/build", label: "Build" },
   { to: "/skills", label: "Skills" },
   { to: "/journal", label: "Journal" },
 ];
@@ -43,6 +47,10 @@ export function App() {
   let page;
   if (seg[0] === "challenge" && seg[1]) page = <ChallengePage id={seg[1]} />;
   else if (seg[0] === "challenges") page = <ChallengesPage />;
+  else if (seg[0] === "build" && seg[1] && seg[2] === "decision" && seg[3]) page = <DecisionPage projectId={seg[1]} id={seg[3]} />;
+  else if (seg[0] === "build" && seg[1] && seg[2] === "step" && seg[3]) page = <StepPage projectId={seg[1]} id={seg[3]} />;
+  else if (seg[0] === "build" && seg[1]) page = <ProjectPage id={seg[1]} />;
+  else if (seg[0] === "build") page = <BuildPage />;
   else if (seg[0] === "skills") page = <SkillsPage />;
   else if (seg[0] === "journal") page = <JournalPage entryId={seg[1]} attemptId={query.get("attempt")} title={query.get("title")} />;
   else page = <TodayPage />;

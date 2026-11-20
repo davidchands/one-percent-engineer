@@ -7,6 +7,13 @@ import type {
   AttemptSummary,
   ChallengePublic,
   ChallengeRow,
+  DecisionView,
+  ProjectCheckResult,
+  ProjectSummary,
+  ProjectView,
+  StepAttemptView,
+  StepSubmitResponse,
+  StepView,
   JournalEntry,
   NewJournalEntry,
   SkillRow,
@@ -53,4 +60,19 @@ export const api = {
   journalEntry: (id: number) => call<JournalEntry>("GET", `/journal/${id}`),
   createJournal: (e: NewJournalEntry) => call<JournalEntry>("POST", "/journal", e),
   updateJournal: (id: number, e: NewJournalEntry) => call<JournalEntry>("PUT", `/journal/${id}`, e),
+
+  // Build by Learning
+  projects: () => call<ProjectSummary[]>("GET", "/projects"),
+  project: (id: string) => call<ProjectView>("GET", `/projects/${id}`),
+  startProject: (id: string, folder?: string) => call<ProjectView>("POST", `/projects/${id}/start`, folder ? { folder } : {}),
+  decision: (projectId: string, id: string) => call<DecisionView>("GET", `/projects/${projectId}/decisions/${id}`),
+  decide: (projectId: string, id: string, body: { optionId: string; reason: string; weights: Record<string, number> }) =>
+    call<DecisionView>("POST", `/projects/${projectId}/decisions/${id}`, body),
+  step: (projectId: string, id: string) => call<StepView>("GET", `/projects/${projectId}/steps/${id}`),
+  startStep: (projectId: string, id: string) => call<StepAttemptView>("POST", `/projects/${projectId}/steps/${id}/attempts`),
+  stepHint: (attemptId: number) => call<StepAttemptView>("POST", `/step-attempts/${attemptId}/hints`),
+  runChecks: (attemptId: number) => call<ProjectCheckResult>("POST", `/step-attempts/${attemptId}/run`),
+  submitStep: (attemptId: number, body: { explanation: string; usedOutsideHelp: boolean }) =>
+    call<StepSubmitResponse>("POST", `/step-attempts/${attemptId}/submit`, body),
+  stepReference: (attemptId: number) => call<StepAttemptView>("POST", `/step-attempts/${attemptId}/reference`, { confirm: true }),
 };

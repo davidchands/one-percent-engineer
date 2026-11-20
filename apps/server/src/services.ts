@@ -44,6 +44,8 @@ export interface Ctx {
   db: DB;
   content: Content;
   now?: () => Date;
+  /** Where new Build by Learning projects go. Defaults to ~/Documents/1pe-projects. */
+  projectsDir?: string;
 }
 const now = (ctx: Ctx) => (ctx.now ? ctx.now() : new Date());
 
