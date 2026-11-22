@@ -1,0 +1,114 @@
+id: add-books
+title: Add a book
+objective: Let a request add a book, and see it in the list afterwards.
+skills:
+  - web.http
+  - web.rest-api
+dependsOn:
+  - server-framework
+startsApp: true
+lesson:
+  concept: "A request can carry data to the server: POST sends a body, and 201 means \"created\""
+  realWorldProblem: >
+    So far your server only answers questions. But a reading list is useless if you can't put a book
+    in it. The page will have a form, and when someone presses "Add", the browser has to hand the
+    server the title and author and ask it to remember them.
+  whyItExists: >
+    GET means "give me something" and must never change anything, so a browser or a search engine
+    can repeat it safely. To create something, HTTP has a different method, POST, whose request
+    carries a body: the data to create it from. The answer then says what happened: 201 Created,
+    plus the new thing, including the id the server gave it so everyone can refer to it later.
+  howItWorks: >
+    The body arrives as text, so first you turn it into a value with JSON.parse (frameworks do this
+    for you). Then your code decides what to store, gives it an id nobody else has, adds it to the
+    list, and answers 201 with the stored book. Next time someone does GET /api/books, the list
+    includes it, because both routes use the same list.
+  example:
+    code: |
+      POST /api/notes HTTP/1.1
+      Content-Type: application/json
+
+      {"text":"Buy milk"}
+
+      HTTP/1.1 201 Created
+      Content-Type: application/json
+
+      {"id":1,"text":"Buy milk","done":false}
+    explanation: >
+      A notes app creates a note. The request body holds the text. The answer is 201, not 200:
+      "something new now exists". It includes the id the server picked, and a field (done) the
+      server filled in itself, so the page doesn't have to guess what was stored.
+  predict:
+    code: |
+      let notes = [];
+      let nextId = 1;
+
+      function addNote(text) {
+        const note = { id: nextId++, text };
+        notes.push(note);
+        return note;
+      }
+
+      addNote("a");
+      addNote("b");
+      console.log(notes.length, addNote("c").id);
+    question: What does this print?
+    answer: "3 3"
+    why: >
+      Each call adds one note, so after three calls the list has 3 notes. nextId++ gives the current
+      value and then adds one, so the third note gets id 3. This is the pattern you need for books:
+      one list, and a counter that never hands out the same number twice.
+  commonMistake: >
+    Answering 200 for a created thing, or building the new book but forgetting to put it in the
+    list, so the answer looks right and the next GET shows nothing.
+task: >
+  Readers can't use a list they can't add to. Make your server accept new books. A new book is sent
+  as JSON with a title and an author, and your server answers with the stored book. It should show
+  up in the list afterwards. For now the list lives in a variable, so it empties when the server
+  restarts. That's the next step.
+requirements:
+  - 'POST /api/books with a JSON body {"title": "...", "author": "..."} answers with status 201'
+  - The answer is the stored book as JSON, with its title and author, a number id, and status "want"
+  - Every book gets an id no other book has
+  - GET /api/books includes the books that were added
+  - Everything from the first step still works
+hints:
+  - A POST is a different route from a GET, even with the same path. Which two things does your server look at to pick a route?
+  - You need one list that both routes can see, and a counter for ids. Where in your file should they live, so they aren't reset on every request?
+  - The new book is what you answer with, so build it first (id, title, author, status), push it into the list, then send it.
+variants:
+  node-http:
+    notes: >
+      With node:http the body arrives in pieces. Read them all into a string (for await (const chunk
+      of req) lets you do that), then JSON.parse the string. Your if/else chain now checks the
+      method as well as the path. Send 201 with res.writeHead(201, headers).
+    hints:
+      - Your handler already checks req.method and the path. A POST to the same path is a new branch in that chain.
+      - "To read the body: let text = \"\"; for await (const chunk of req) text += chunk; then JSON.parse(text). The handler function must be async to use await."
+      - "if (req.method === \"POST\" && path === \"/api/books\") { const body = JSON.parse(___); ... res.writeHead(___, { \"content-type\": \"application/json\" }); res.end(JSON.stringify(___)); }"
+  express:
+    notes: >
+      Add app.use(express.json()) once, before your routes. It reads and parses JSON bodies and puts
+      the result in req.body. Then app.post("/api/books", handler) is a route like the ones you have,
+      and res.status(201).json(book) answers with the right status.
+    hints:
+      - Routes are chosen by method and path. app.get registers GET routes, so what registers POST routes?
+      - Without app.use(express.json()) before your routes, req.body is undefined. Add it near the top.
+      - "app.post(\"/api/books\", (req, res) => { const book = { id: ___, title: req.body.___, ... }; list.push(book); res.status(___).json(book); });"
+  fastify:
+    notes: >
+      Fastify already parses JSON bodies for you: it's in request.body. Register app.post(path,
+      handler) like a GET route. To choose the status, use reply.code(201).send(book) instead of
+      returning the value, since returning alone would answer 200.
+    hints:
+      - Routes are chosen by method and path. app.get registers GET routes, so what registers POST routes?
+      - request.body holds the parsed JSON. The second parameter of your handler, reply, lets you pick the status.
+      - "app.post(\"/api/books\", async (request, reply) => { const book = { id: ___, title: request.body.___, ... }; list.push(book); return reply.code(___).send(book); });"
+commonMistakes:
+  - Answering a created book with 200 instead of 201
+  - Building the new book but never adding it to the list
+  - Putting the list inside the handler, so each request starts with an empty one
+  - Giving the new book an id from list.length, which repeats after a delete
+explanationCheckpoint: >
+  Walk through what happens between the browser sending a new book and the next GET /api/books
+  showing it. Where is the book kept in between, and what would happen if you restarted the server?

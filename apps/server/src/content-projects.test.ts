@@ -91,9 +91,16 @@ test("the real reading-list project loads, in milestone order", () => {
     [
       { kind: "decision", id: "server-framework" },
       { kind: "step", id: "first-route" },
+      { kind: "step", id: "add-books" },
+      { kind: "decision", id: "storage" },
+      { kind: "step", id: "persist-books" },
+      { kind: "step", id: "validate-books" },
+      { kind: "step", id: "change-books" },
+      { kind: "step", id: "serve-page" },
     ],
   );
   assert.deepEqual([...project.steps.get("first-route")!.references.keys()], ["express", "fastify", "node-http"]);
+  assert.equal(project.steps.get("serve-page")!.references.size, 6, "3 servers × 2 storage options");
 });
 
 test("a step can't depend on a decision the learner hasn't made yet", () => {

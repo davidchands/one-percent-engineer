@@ -1,0 +1,80 @@
+# Skill graph: Phase 3 (the web and data), the nodes the Build by Learning projects teach.
+#
+# These are practised by building a project, not by challenges, so they gain evidence
+# ("project_use") when you pass a project step that lists them. Phases 1–2 come first.
+
+skills:
+  - id: web.http
+    name: HTTP requests and responses
+    domain: web
+    phase: 3
+    why: Every web page and app talks to a server in one agreed shape (method, path, status, headers, body), so any client can talk to any server.
+    prerequisites: [js.functions, js.objects]
+    careerRelevance: 0.9
+    objectives:
+      "1": Name the parts of a request (method, path, headers, body) and of a response (status, headers, body).
+      "2": Explain what 200, 201, 400, 404 and 500 each tell the code that reads them.
+      "3": Fix a server that answers the wrong status or Content-Type, with a hint.
+      "4": Write a server that answers several URLs with correct statuses and JSON, without help.
+      "5": Read an unfamiliar server's routes and say what each request will get back.
+      "6": Decide which status a new situation deserves, and defend it against the alternatives.
+
+  - id: web.rest-api
+    name: Designing a REST API
+    domain: web
+    phase: 3
+    why: Many pages and apps need the same data, so the server offers it through predictable URLs and methods (GET to read, POST to create, PATCH to change, DELETE to remove).
+    prerequisites: [web.http, js.arrays]
+    careerRelevance: 0.9
+    objectives:
+      "1": Say which method (GET, POST, PATCH, DELETE) fits reading, creating, changing and removing a thing.
+      "2": Explain why /api/books and /api/books/7 mean different things, and what each method does on each.
+      "3": Add a missing route to an existing API, following its conventions, with a hint.
+      "4": Design and build the routes for a new resource without help.
+      "5": Review an unfamiliar API and point out where it breaks conventions or is inconsistent.
+      "6": Choose between designs for an API (nested URLs, bulk routes, partial updates) and defend it.
+
+  - id: data.persistence
+    name: Persisting data
+    domain: data
+    phase: 3
+    why: A program's variables disappear when it stops, so anything that must survive a restart has to be written somewhere that outlasts the program.
+    prerequisites: [js.objects, js.error-handling]
+    careerRelevance: 0.95
+    objectives:
+      "1": Explain why data kept in variables is lost on restart, and name two places data can be kept instead.
+      "2": Explain what is kept and what is lost when the same program runs twice.
+      "3": Make an in-memory feature survive a restart, with a hint.
+      "4": Store and read back records in a file or database, with unique ids, without help.
+      "5": Find a bug caused by stale, duplicated or half-written data in unfamiliar code.
+      "6": Choose a storage approach for a new app and defend it, including what changing it later would cost.
+
+  - id: web.validation
+    name: Validating input
+    domain: web
+    phase: 3
+    why: Whatever reaches a server can be wrong, missing or hostile, so the server must check it and refuse bad input clearly instead of storing it or crashing.
+    prerequisites: [web.rest-api, js.error-handling]
+    careerRelevance: 0.9
+    objectives:
+      "1": Give three ways a request body can be wrong (missing, wrong type, wrong value).
+      "2": Explain why checking input in the browser is not enough, and why the answer to bad input is 400, not 500.
+      "3": Add a missing check to a route, with a hint.
+      "4": Validate every field of a new route and answer clear errors, without help.
+      "5": Find the input that an unfamiliar route fails to check, and show the request that exploits it.
+      "6": Decide what to reject, what to clean up and what to allow, and defend the rules.
+
+  - id: web.html-forms
+    name: Pages, forms and the DOM
+    domain: web
+    phase: 3
+    why: A page is a tree of elements the browser shows. To collect input and show data, you build that tree in HTML and change it with JavaScript.
+    prerequisites: [js.objects, js.arrays]
+    careerRelevance: 0.8
+    objectives:
+      "1": Name the HTML elements for a heading, a list, a form, an input and a button.
+      "2": Explain what the DOM is, and how a script finds and changes an element.
+      "3": Build a page with a form and a list with hints.
+      "4": Build a page that fetches data and shows it, and sends a form, without help.
+      "5": Read an unfamiliar page's HTML and script and say what the user sees and what a click does.
+      "6": Decide what the server renders and what the browser renders, and defend it.

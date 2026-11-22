@@ -1,0 +1,104 @@
+id: serve-page
+title: Your first page
+objective: Serve a web page with a form and a list, and have its script fetch your books.
+skills:
+  - web.html-forms
+  - web.http
+dependsOn:
+  - server-framework
+  - storage
+startsApp: true
+lesson:
+  concept: "A page is HTML text the server sends with Content-Type text/html, and a script in it can fetch data from your API"
+  realWorldProblem: >
+    Your API works, but only a developer using a command line can use it. Readers need a page
+    they can open in a browser: a list of their books and a form to add one.
+  whyItExists: >
+    A browser knows how to show a page when a server answers a URL with HTML and says it is HTML
+    (Content-Type text/html). The page is a tree of elements: headings, lists, forms. A script in
+    the page can run in the browser, call your API with fetch, and change the elements to show
+    what came back. The same server can serve the page and the API.
+  howItWorks: >
+    Your server answers GET / with the contents of an HTML file and the header text/html. The HTML
+    has a form (inputs with name attributes, and a button), an empty list with an id, and a script.
+    When the page loads, the script fetches /api/books, makes one li element per book and appends
+    them to the list. When the form is submitted, the script sends a POST with fetch and reloads
+    the list. Note that a script runs in the user's browser, not on your server.
+  example:
+    code: |
+      <h1>Notes</h1>
+      <ul id="note-list"></ul>
+      <script>
+        fetch("/api/notes")
+          .then((res) => res.json())
+          .then((notes) => {
+            const list = document.querySelector("#note-list");
+            for (const note of notes) {
+              const li = document.createElement("li");
+              li.textContent = note.text;
+              list.append(li);
+            }
+          });
+      </script>
+    explanation: >
+      An empty list with an id, and a script that finds it with querySelector, asks the API for the
+      notes, and builds one li per note. textContent puts the text in safely, as text and not as HTML.
+  predict:
+    code: |
+      const list = document.querySelector("#note-list");
+      const li = document.createElement("li");
+      li.textContent = "Buy milk";
+      console.log(list.children.length);
+    question: Before this runs the list is empty. What does it print, and why?
+    answer: "0"
+    why: >
+      createElement makes an element, but it only exists in memory until you put it in the page
+      with list.append(li). Printing the number of children happens before that, so it is still 0.
+  commonMistake: >
+    Sending the HTML but forgetting the text/html header, so the browser shows the source as plain
+    text. Or putting a book's title in with innerHTML, so a title containing <script> runs as code.
+task: >
+  Time for readers to see their books. Make the page your server answers at /: a heading, a form
+  with a title and an author field and a button, and a list of books. When the page loads it shows
+  your books, and sending the form adds a book. The checks only look at the page's structure, so
+  open it in your browser to see that it really works.
+requirements:
+  - GET / answers 200 with Content-Type text/html
+  - The page has a title (for the browser tab) and a <form> with inputs named "title" and "author"
+  - The page has a list element with id="book-list" and a <script>
+  - Opened in a browser, the page shows your books and adding one with the form updates the list
+  - The API routes and the 404 for unknown paths still work
+hints:
+  - A page is just another answer. Which two parts of the answer tell the browser to show it as a page instead of printing it?
+  - Write the HTML in its own file (public/index.html) and send its contents when someone asks for /. What do you need to read the file?
+  - Build the page in this order, checking in the browser each time. First static HTML, then the list from fetch, then the form.
+  - If the page is blank, open the browser's developer tools (F12) and look at the Console and Network tabs. They show what failed.
+variants:
+  node-http:
+    notes: >
+      Read the file once when the server starts, with readFileSync from "node:fs". In your branch
+      for GET /, send it with res.writeHead(200, { "content-type": "text/html; charset=utf-8" }) and
+      res.end(html).
+  express:
+    notes: >
+      Read the file with readFileSync, then in app.get("/") answer res.type("html").send(html), which
+      sets text/html for you. (Express also has express.static for serving a whole folder of files,
+      which is the usual next step.)
+  fastify:
+    notes: >
+      Read the file with readFileSync, then in app.get("/") answer reply.type("text/html; charset=utf-8").send(html).
+      Returning the string alone would label it as plain text.
+  json-file:
+    notes: >
+      Nothing changes in how you store books. The page only talks to your API.
+  sqlite:
+    notes: >
+      Nothing changes in how you store books. The page only talks to your API.
+commonMistakes:
+  - Sending HTML without Content-Type text/html, so the browser shows the code as text
+  - Giving the inputs an id but no name, or the wrong name
+  - Using innerHTML with a book's title, so a title containing HTML or a script gets run
+  - Forgetting event.preventDefault() in the submit handler, so the browser reloads the page and the fetch never completes
+explanationCheckpoint: >
+  Trace what happens from typing a URL in the browser to seeing your books on the page. Which parts
+  run on your server, which run in the browser, and how many requests are there?

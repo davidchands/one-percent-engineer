@@ -1,0 +1,69 @@
+id: storage
+title: Where will your books be kept?
+problem: >
+  Right now your list lives in a variable, so every restart of the server forgets it. A real app
+  keeps its data somewhere that outlasts the program. Every option below gives the same result from
+  the outside: add a book, restart, and it's still there. They differ in how you store the data, how
+  much you learn, and how far each one stretches when the app grows.
+criteria:
+  - id: see-the-data
+    label: See your data with your own eyes
+    description: You can open the stored data and read it, with nothing between you and it.
+  - id: few-new-ideas
+    label: Fewest new ideas right now
+    description: How little you need to learn before books survive a restart.
+  - id: jobs
+    label: What you'll meet at work
+    description: How likely you are to see it in real job listings and codebases.
+  - id: grows-well
+    label: Stays correct as it grows
+    description: How well it copes with lots of books, searching, and two requests at once.
+options:
+  - id: json-file
+    name: A JSON file
+    summary: >
+      You keep the books in a file, books.json. Each change reads the file, changes the list and
+      writes it back. It's the same list-of-objects you already know, saved as text.
+    strengths:
+      - You can open the file in your editor and read your data
+      - Nothing new to learn beyond reading and writing a file
+    costs:
+      - Every change rewrites the whole file, and two requests at once can overwrite each other
+      - Searching means looping over everything, and it gets slow with many books
+    whenProsChooseIt: >
+      For small tools, scripts and prototypes where one person uses the data and losing the odd
+      write doesn't matter. Not for anything many people use at once.
+    newIdeas:
+      - reading and writing files
+      - JSON.parse and JSON.stringify
+    relatedSkills:
+      - js.objects
+      - js.error-handling
+    fit: { see-the-data: 5, few-new-ideas: 5, jobs: 2, grows-well: 1 }
+  - id: sqlite
+    name: SQLite (a database in one file)
+    summary: >
+      A real database that lives in a single file. You describe a table (columns for title, author,
+      status) and ask for rows with SQL, a small language for questions like "all books I'm reading".
+    strengths:
+      - "Real database behaviour: safe against two requests at once, and fast to search"
+      - SQL is used almost everywhere, and what you learn here carries to bigger databases
+    costs:
+      - SQL and tables are a new language and a new way of thinking about data
+      - You can't read the data in an editor, you need a tool or your own queries
+    whenProsChooseIt: >
+      For apps with one server and moderate data, from personal tools to many mobile apps. Teams
+      often start here and move to a bigger database like Postgres when they need several servers.
+    newIdeas:
+      - tables and rows
+      - SQL queries
+      - prepared statements
+      - primary keys
+    relatedSkills:
+      - js.objects
+      - js.arrays
+    fit: { see-the-data: 2, few-new-ideas: 2, jobs: 4, grows-well: 4 }
+costOfChangingLater: >
+  Medium to high. The URLs and answers of your API stay the same, so the checks don't change, but
+  the code that reads and writes books is rewritten, and any books you already saved have to be
+  moved by hand. Changing now, before more routes depend on it, costs an evening.

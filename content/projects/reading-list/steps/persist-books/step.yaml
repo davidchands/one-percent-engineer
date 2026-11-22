@@ -1,0 +1,158 @@
+id: persist-books
+title: Keep books after a restart
+objective: Make the books survive the server stopping and starting again.
+skills:
+  - data.persistence
+dependsOn:
+  - server-framework
+  - storage
+startsApp: true
+lesson:
+  concept: "Variables vanish when a program stops, so lasting data must be written somewhere that outlasts it"
+  realWorldProblem: >
+    Your list works, until you stop the server to change some code, or your laptop sleeps. When the
+    server starts again, every book is gone. Nobody will use a list that forgets.
+  whyItExists: >
+    A running program keeps its variables in memory, which is wiped when the program stops. Anything
+    that has to survive must be written to storage outside the program: a file on disk, or a
+    database. The program then reads from it when it starts or when a request needs it.
+  howItWorks: >
+    Move everything about "how books are kept" behind a few functions (list, add). The routes call
+    those functions and know nothing about where books live. Inside the functions you read from and
+    write to the storage. Two details trip people up: you must write on every change, not just when
+    the program ends, because the program may be killed; and ids must come from the stored data, not
+    from a counter in memory, or after a restart a new book would get an id that is already taken.
+  example:
+    code: |
+      import { readFileSync, writeFileSync, existsSync } from "node:fs";
+
+      const file = "notes.json";
+
+      export function listNotes() {
+        return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : [];
+      }
+
+      export function addNote(text) {
+        const notes = listNotes();
+        const id = notes.reduce((max, n) => Math.max(max, n.id), 0) + 1;
+        const note = { id, text };
+        writeFileSync(file, JSON.stringify([...notes, note]));
+        return note;
+      }
+    explanation: >
+      A notes app keeps notes in a file. Every call reads what's stored, works out the next id from
+      the notes that exist (largest id plus one), and writes everything back before returning. After
+      a restart, the file is still there, so listNotes() still finds everything.
+  predict:
+    code: |
+      // notes.json already holds [{"id":1,"text":"a"},{"id":2,"text":"b"}]
+      let nextId = 1;
+
+      function addNote(text) {
+        const notes = JSON.parse(readFileSync("notes.json", "utf8"));
+        const note = { id: nextId++, text };
+        writeFileSync("notes.json", JSON.stringify([...notes, note]));
+        return note;
+      }
+
+      console.log(addNote("c").id);
+    question: The program has just started. What id does the new note get, and what is wrong with it?
+    answer: "1, and it's already taken by the first note"
+    why: >
+      nextId lives in memory, so it starts at 1 on every start, even though the file holds notes with
+      ids 1 and 2. The file now has two notes with id 1. Ids must be worked out from the stored data.
+  commonMistake: >
+    Keeping a counter for ids in memory, or saving only when the program exits. Both look fine until
+    the first restart (or crash), then books go missing or collide.
+task: >
+  Restarting your server wipes your list. Make books survive: move how books are kept out of your
+  routes, into a place that outlasts the program. The routes should behave exactly as before; only
+  where the books live changes. The checks restart your app (a second copy, reading the same
+  folder) and look for the books you added.
+requirements:
+  - A book you added is still listed after your app is stopped and started again
+  - Its title, author, status and id are the same after the restart
+  - A book added after a restart gets an id no existing book has
+  - Every route from the earlier steps works as before
+hints:
+  - Which line of your code decides where books live? If it's a variable at the top of the file, that's what changes.
+  - Put "how books are kept" behind two functions, list() and add(book). Then your routes don't need to change when the storage does.
+  - Save on every add, not when the program exits. A program can be killed without warning.
+  - Don't count ids in a variable. Work out the next id from the books you've stored.
+variants:
+  node-http:
+    notes: >
+      Your routes stay in server.js. Move the list and its counter into a new file, books.js, that
+      exports list() and add(). server.js imports them and calls them. Nothing else about your
+      handler changes.
+  express:
+    notes: >
+      Your routes stay in server.js. Move the list and its counter into a new file, books.js, that
+      exports list() and add(). server.js imports them and calls them. Nothing else about your
+      handler changes.
+  fastify:
+    notes: >
+      Your routes stay in server.js. Move the list and its counter into a new file, books.js, that
+      exports list() and add(). server.js imports them and calls them. Nothing else about your
+      handler changes.
+  json-file:
+    notes: >
+      Keep the books in books.json next to your code. list() reads and parses the file (or answers
+      [] if the file doesn't exist yet). add() reads, works out the next id from the books it read,
+      adds the new book, and writes the whole list back with JSON.stringify. Use readFileSync and
+      writeFileSync from "node:fs", and URLs relative to your module (new URL("./books.json",
+      import.meta.url)) so it works from any folder.
+    example:
+      code: |
+        import { readFileSync, writeFileSync, existsSync } from "node:fs";
+
+        const file = new URL("./notes.json", import.meta.url);
+
+        function load() {
+          return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : [];
+        }
+      explanation: >
+        load() answers the saved list, or an empty one the first time. Every other function starts
+        with load() and ends with writeFileSync, so the file always has the latest list.
+    hints:
+      - "Two helper functions make everything else short: one that loads the whole list from the file, one that saves a whole list to it."
+      - If the file doesn't exist yet, loading should give an empty list, not crash. existsSync from node:fs checks.
+      - "New id: the biggest id among the books you loaded, plus one. An empty list needs a starting value, so think about Math.max or reduce with a starting number."
+  sqlite:
+    notes: >
+      Use node:sqlite (built into Node 22): import { DatabaseSync } from "node:sqlite", then
+      new DatabaseSync("books.db"). Create the table once with CREATE TABLE IF NOT EXISTS, so it
+      works on the first start and every later one. add() runs an INSERT with ? placeholders and the
+      database gives the id (AUTOINCREMENT); list() runs a SELECT. Never put values into the SQL
+      text yourself, always pass them as parameters after the placeholders.
+    example:
+      code: |
+        import { DatabaseSync } from "node:sqlite";
+
+        const db = new DatabaseSync("notes.db");
+        db.exec("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL)");
+
+        export function addNote(text) {
+          const result = db.prepare("INSERT INTO notes (text) VALUES (?)").run(text);
+          return { id: Number(result.lastInsertRowid), text };
+        }
+
+        export function listNotes() {
+          return db.prepare("SELECT id, text FROM notes ORDER BY id").all();
+        }
+      explanation: >
+        The table is described once, in SQL. INSERT adds a row, and the ? is filled with the value
+        you pass to run(), which keeps data and SQL apart. lastInsertRowid is the id the database
+        chose. SELECT ... ORDER BY id gives the rows back in a list of objects.
+    hints:
+      - "A table is like a spreadsheet: columns with names and types, and one row per book. Which columns does a book need?"
+      - "CREATE TABLE IF NOT EXISTS runs safely every time the app starts. Run it once, at the top of your storage file."
+      - "INSERT INTO books (title, author, status) VALUES (?, ?, ?) and pass the three values to .run(...). The database picks the id for you."
+commonMistakes:
+  - Saving only when the process exits, so a crash loses everything
+  - Counting ids in a variable that restarts at 1
+  - Reading the file once at startup and never again, so a second copy of the app can't see changes
+  - Writing the storage path as a relative string, so it depends on where the app is started from
+explanationCheckpoint: >
+  Say where your books are kept now, and exactly what happens to them when the app stops and
+  starts. Why is the next id worked out from the stored books and not from a counter?
