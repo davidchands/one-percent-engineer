@@ -94,7 +94,7 @@ test("full loop: decide → start step → hint → failing check → pass with 
     assert.equal(res.allPassed, true);
     assert.equal(res.independence, "hinted");
     assert.equal(projects.getStepView(ctx, "reading-list", "first-route").status, "passed");
-    assert.equal(projects.getProjectView(ctx, "reading-list").next, null, "nothing left in the draft project");
+    assert.deepEqual(projects.getProjectView(ctx, "reading-list").next, { kind: "step", id: "add-books" }, "the next thing on the roadmap");
   } finally {
     ctx.cleanup();
   }

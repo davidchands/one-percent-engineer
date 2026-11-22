@@ -4,8 +4,15 @@ Build one real full-stack app, one milestone at a time, learning each idea as yo
 When the project needs a technology choice, the app **teaches you the options and you decide**.
 It never chooses for you.
 
-Status: **PR 1 (foundation) and PR 2 (server and the Build tab) are done.** Next is PR 3, the full
-reading-list project. The rest of this page is the approved plan.
+Status: **PR 1 (foundation), PR 2 (server and the Build tab) and PR 3 (the reading-list project) are
+done.** Next is PR 4, the VS Code panel. The rest of this page is the approved plan.
+
+**What PR 3 shipped:** six milestones (server, add books, storage, input checking, change and
+remove, a page), two decisions (server framework; storage: JSON file or SQLite), six steps with
+30 reference solutions, and five new skill nodes (`web.http`, `web.rest-api`, `data.persistence`,
+`web.validation`, `web.html-forms`). The milestones for connecting the page to the API in depth
+and for shipping are not written yet. The page step only checks the page's structure (the plan's
+"lightweight frontend checks"), so you open it in a browser to see it work.
 
 ## How a project works
 

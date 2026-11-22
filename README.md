@@ -93,7 +93,8 @@ needs a technology choice (which server library? which database?), it teaches yo
 their trade-offs, and **you decide**, with your reasons saved in your project. Then you write the code
 in your own project folder, and **Run checks** starts your app and tests what it does.
 
-It's early: the first project, a reading list, currently has its first milestone. More details:
+The first project is a reading list: a server, storage, input checking and a web page, in six
+milestones, with two decisions along the way (server library, then JSON file or SQLite). More details:
 [docs/BUILD-BY-LEARNING.md](docs/BUILD-BY-LEARNING.md).
 
 ## New challenges on demand

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reading list</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 36rem; margin: 2rem auto; padding: 0 1rem; }
+      form { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+      li { display: flex; gap: 0.5rem; align-items: center; padding: 0.4rem 0; }
+      li span { flex: 1; }
+    </style>
+  </head>
+  <body>
+    <h1>Reading list</h1>
+    <form id="add-form">
+      <input name="title" placeholder="Title" required />
+      <input name="author" placeholder="Author" required />
+      <button type="submit">Add book</button>
+    </form>
+    <ul id="book-list"></ul>
+    <script>
+      const list = document.querySelector("#book-list");
+      const form = document.querySelector("#add-form");
+
+      async function load() {
+        const books = await (await fetch("/api/books")).json();
+        list.innerHTML = "";
+        for (const book of books) {
+          const li = document.createElement("li");
+          const label = document.createElement("span");
+          label.textContent = book.title + " by " + book.author + " (" + book.status + ")";
+          const next = document.createElement("button");
+          next.textContent = book.status === "want" ? "Start reading" : book.status === "reading" ? "Finish" : "Read again";
+          next.onclick = async () => {
+            const status = book.status === "want" ? "reading" : book.status === "reading" ? "read" : "want";
+            await fetch("/api/books/" + book.id, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ status }) });
+            load();
+          };
+          const remove = document.createElement("button");
+          remove.textContent = "Remove";
+          remove.onclick = async () => {
+            await fetch("/api/books/" + book.id, { method: "DELETE" });
+            load();
+          };
+          li.append(label, next, remove);
+          list.append(li);
+        }
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const res = await fetch("/api/books", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ title: data.get("title"), author: data.get("author") }),
+        });
+        if (res.ok) {
+          form.reset();
+          load();
+        } else {
+          alert((await res.json()).error);
+        }
+      });
+
+      load();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+id: change-books
+title: Change and remove books
+objective: Mark a book as reading or read, and remove books you don't want.
+skills:
+  - web.rest-api
+  - data.persistence
+dependsOn:
+  - server-framework
+  - storage
+startsApp: true
+task: >
+  A reading list is about progress: a book starts as "want", becomes "reading", then "read", and
+  sometimes you change your mind and remove it. Give your server the two routes for that. Only the
+  status can change; changing it must not lose the title or the author, and both changes must
+  survive a restart like everything else.
+requirements:
+  - 'PATCH /api/books/<id> with {"status": "reading"} answers 200 with the updated book (all its fields)'
+  - A status that isn't want, reading or read is refused with 400 and changes nothing
+  - DELETE /api/books/<id> answers 204 with no body, and the book is gone from the list and from its own URL
+  - Other books are not affected by changing or deleting one
+  - PATCH and DELETE for an id that doesn't exist answer 404 with an "error" sentence
+hints:
+  - What's the difference between replacing a thing and changing one part of it? Which one is PATCH for?
+  - Look for the place where you find a book by its id. Both new routes start with the same lookup, so write it once.
+  - Remember what each answer has to say. If the book isn't there, which status is that? And what do you send back when there is nothing left to send?
+  - If a change works but vanishes after a restart, did your storage actually write it down?
+variants:
+  node-http:
+    notes: >
+      Add two more branches to your if/else chain, one for method PATCH and one for DELETE, both
+      matched on the same id pattern as the single-book route. For 204 call res.writeHead(204) and
+      res.end() with nothing in it.
+  express:
+    notes: >
+      app.patch("/api/books/:id", ...) and app.delete("/api/books/:id", ...). For 204 use
+      res.status(204).end(): there is no JSON to send, so res.json would be wrong here.
+  fastify:
+    notes: >
+      app.patch("/api/books/:id", ...) and app.delete("/api/books/:id", ...). For 204 use
+      reply.code(204).send() with nothing in it.
+  json-file:
+    notes: >
+      update(id, patch) loads the list, finds the book, changes the field on that object, saves
+      the whole list, and answers the book (or null if there is none). remove(id) keeps every book
+      except that id, saves, and answers whether something was removed.
+  sqlite:
+    notes: >
+      update uses UPDATE books SET status = ? WHERE id = ? and then reads the row back with
+      get(id), which answers null for an id that doesn't exist. remove runs DELETE FROM books WHERE
+      id = ?: the object it returns has changes, the number of rows removed, so changes > 0 tells
+      you whether the book existed.
+commonMistakes:
+  - Replacing the whole book with only the new status, losing the title and author
+  - Answering 200 or 404 for a successful delete, or 200 with an empty body for something that has no body
+  - Changing the book in memory but not saving it
+  - Skipping validation on PATCH, so any status gets stored
+explanationCheckpoint: >
+  Why is changing a status a PATCH and not a POST, and why does a successful DELETE answer 204 with
+  no body? What would the page do wrong if you answered 200 and an empty body?

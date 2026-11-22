@@ -1,0 +1,112 @@
+id: validate-books
+title: Refuse bad input
+objective: Check what arrives, answer 400 with a reason when it's wrong, and add a route for one book.
+skills:
+  - web.validation
+  - web.rest-api
+  - js.error-handling
+dependsOn:
+  - server-framework
+  - storage
+startsApp: true
+lesson:
+  concept: "Anything that reaches a server can be wrong, so check it and refuse bad input with 400 before using it"
+  realWorldProblem: >
+    Right now POST /api/books stores whatever it's sent. An empty title, a number where text should
+    be, or a body that isn't even JSON. Some of these get stored and break the page later; one makes
+    your server crash for everybody.
+  whyItExists: >
+    A server can't control who calls it. A page can check a form, but anyone can send a request
+    without the page. So the server is the only place that can protect your data. When input is
+    wrong, the status says so: 400 means "you sent something I can't use". It's the caller's
+    mistake, not the server's (that would be 500), and a sentence saying what's wrong helps them fix it.
+  howItWorks: >
+    Before using the body, check it: is it an object, are the fields there, are they the right
+    type, is the value one you accept? If anything fails, answer 400 with { error: "..." } and
+    stop: store nothing. A body that isn't valid JSON fails already when it is parsed, so catching
+    that error is part of checking too. Clean-up that is always safe, like trimming spaces, happens
+    after the checks pass.
+  example:
+    code: |
+      function checkNote(body) {
+        if (typeof body !== "object" || body === null) return "Send a JSON object";
+        if (typeof body.text !== "string" || body.text.trim() === "") return "text must be a non-empty string";
+        return null;
+      }
+
+      // in the route:
+      const problem = checkNote(body);
+      if (problem) return respond(400, { error: problem });
+    explanation: >
+      One function answers either a sentence describing the problem, or null for "fine". The route
+      asks it first and stops on a problem, so a bad note never reaches the storage.
+  predict:
+    code: |
+      function check(body) {
+        if (typeof body.text !== "string") return "text must be a string";
+        return null;
+      }
+
+      console.log(check({ text: "" }), check({}), check(null));
+    question: What does this print, or does something go wrong?
+    answer: "It throws an error on check(null)"
+    why: >
+      check({ text: "" }) returns null (an empty string is still a string, so it passes, which is
+      probably not what you want) and check({}) returns the message. But check(null) reads null.text,
+      which throws. Always check that the body is an object before looking inside it.
+  commonMistake: >
+    Checking one field and trusting the rest, checking in the page but not the server, or letting a
+    parse error crash the request instead of answering 400.
+task: >
+  Your server will store anything it's sent, and a broken request can even crash it. Make it
+  refuse bad books, and say why. Also add the URL for a single book (/api/books/<id>), which the
+  page needs when it shows one book. Refused books must never be stored.
+requirements:
+  - A new book needs a title and an author, both non-empty text. Anything else is refused with 400
+  - If status is sent, it must be "want", "reading" or "read"
+  - A body that isn't valid JSON, or isn't an object, is refused with 400 and the server keeps running
+  - Every refusal is JSON with an "error" sentence saying what's wrong
+  - Refused books are not stored
+  - Spaces around the title and author are removed before storing
+  - GET /api/books/<id> answers that book, or 404 with an "error" sentence if there is none
+hints:
+  - Make a list of everything that can be wrong with a new book (not an object, missing title, empty title, wrong type, bad status). Which of those does your server survive today?
+  - Write one function that takes the body and answers either a sentence describing the problem or null. Call it before storing, and stop at the first problem.
+  - A body that isn't JSON fails while being read, before your check even runs. How does your framework let you catch that, and which status should it become?
+  - Test it like an attacker would. What do you send to make your server do something you didn't plan?
+variants:
+  node-http:
+    notes: >
+      JSON.parse throws a SyntaxError for invalid JSON, and because your handler is async the
+      rejected promise would crash the process. Wrap the routing in try / catch, and answer 400 when
+      the error is a SyntaxError. For GET /api/books/<id>, match the path with a regular expression
+      (like /^\/api\/books\/(\d+)$/) and read the id from the match.
+  express:
+    notes: >
+      express.json() already catches broken JSON, but it hands the error to Express's default
+      handler, which answers an HTML page. Add an error handler at the end: a function with four
+      parameters (err, req, res, next). In it, answer 400 JSON when err.type is "entity.parse.failed",
+      and 500 for anything else. Single books: app.get("/api/books/:id") and read req.params.id.
+  fastify:
+    notes: >
+      Fastify already answers 400 with JSON when the body isn't valid JSON, so you only need to
+      check what was parsed. In your handler, use reply.code(400).send({ error }) for problems.
+      Single books: app.get("/api/books/:id") and read request.params.id. Route parameters are
+      always strings, so Number() it before looking up.
+  json-file:
+    notes: >
+      Nothing changes in how you store. Make your add() trim the title and author before saving,
+      and add a get(id) that loads the list and finds the book (or answers null).
+  sqlite:
+    notes: >
+      Nothing changes in how you store. Make your add() trim the title and author before inserting,
+      and add a get(id) that runs SELECT ... WHERE id = ? and answers the row (or null).
+commonMistakes:
+  - Checking only the title, so a missing author or a number passes
+  - Treating an empty or all-space title as fine because it is "a string"
+  - Answering 500 (or crashing) for bad input, which is the caller's mistake, not the server's
+  - Storing the book first and checking afterwards, so refused books still appear
+  - Reading body.title before checking that the body is an object at all
+explanationCheckpoint: >
+  Explain why the server has to check input even though the page will have a form that checks it
+  too. Why is bad input 400 and not 500?

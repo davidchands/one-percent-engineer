@@ -5,15 +5,15 @@ brief: >
   and the ones you've finished. You'll build every part of it yourself: the page people see, the
   server behind it, and somewhere to keep the data so it's still there tomorrow.
 whatYouBuild:
-  - A web page that lists your books and lets you add one
   - A server with an API (a set of URLs your page talks to)
   - Storage, so your list survives a restart
+  - Input checking, so bad requests are refused clearly
+  - A web page that lists your books and lets you add and change them
 prerequisites:
   - js.functions
   - js.objects
   - js.arrays
-# Draft: PR 1 proves the format with the server milestone only. The earlier milestones (the page,
-# interactivity) and the later ones (storage, connecting the page, shipping) arrive in PR 3.
+  - js.error-handling
 milestones:
   - id: a-server
     title: A server that answers
@@ -24,3 +24,41 @@ milestones:
       - checkpoint: >
           Your browser asks for /api/books. Describe, step by step, what happens between that request
           leaving the browser and the [] arriving back.
+  - id: b-books
+    title: Books you can add
+    goal: A request can add a book, and the next request to list books shows it.
+    items:
+      - step: add-books
+      - checkpoint: >
+          Why does adding a book use POST and not GET? What goes wrong if "add a book" were a GET,
+          for example if a browser or a search engine visited that URL?
+  - id: c-storage
+    title: Books that stay
+    goal: You can stop the server and start it again, and your books are still there.
+    items:
+      - decision: storage
+      - step: persist-books
+      - checkpoint: >
+          Describe everything that happens to a book from the request that adds it until you open
+          the stored data. What is written, where, and when?
+  - id: d-checking
+    title: Input you can trust
+    goal: Bad requests are refused with a clear reason, never stored, and never crash the server.
+    items:
+      - step: validate-books
+      - checkpoint: >
+          Think of a request that your checks would still let through. What could it do, and what
+          check would you add?
+  - id: e-changes
+    title: Change and remove
+    goal: A book can move from want to reading to read, and can be removed.
+    items:
+      - step: change-books
+  - id: f-page
+    title: A page to use it
+    goal: Opening http://127.0.0.1:<port>/ in a browser shows your books and lets you add, move and remove them.
+    items:
+      - step: serve-page
+      - checkpoint: >
+          Open the page and add a book. Trace every request your browser sent, in order, and what
+          each one carried and got back. (The Network tab in developer tools shows them.)
