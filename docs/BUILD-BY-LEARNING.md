@@ -4,12 +4,17 @@ Build one real full-stack app, one milestone at a time, learning each idea as yo
 When the project needs a technology choice, the app **teaches you the options and you decide**.
 It never chooses for you.
 
-Status: **PR 1 (foundation), PR 2 (server and the Build tab), PR 3 (the reading-list project) and
-PR 4 (the VS Code Build panel) are done.** Next is PR 5, the optional `/build-step` skill. The rest of
+Status: **All five PRs are done: foundation, server and the Build tab, the reading-list project, the
+VS Code Build panel, and the `/build-step` skill.** The rest of
 this page is the approved plan.
 
 **What PR 4 shipped:** a Build panel in the VS Code sidebar with the current step, Run checks, hints
 and Open project folder. Decisions and submitting stay in the web app.
+
+**What PR 5 shipped:** `/build-step` (in `.claude/skills/build-step`), which adds a step, a new option
+for a decision, or a whole project, with reference and wrong-answer snapshots, and proves it with
+`pnpm validate:content`. Like `/daily-challenge` it never shows solutions in chat and never makes
+the learner's decisions.
 
 **What PR 3 shipped:** six milestones (server, add books, storage, input checking, change and
 remove, a page), two decisions (server framework; storage: JSON file or SQLite), six steps with

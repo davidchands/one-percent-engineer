@@ -115,6 +115,10 @@ It reads your progress, decides what you need next, and writes a new challenge f
 Every new challenge must pass the same quality check as the built-in ones before it appears.
 You can also ask for several at once (`/daily-challenge 3`) or a topic (`/daily-challenge js.arrays`).
 
+To add steps, options (say, Postgres as a storage choice) or projects, type `/build-step` in Claude
+Code. It writes them with reference solutions and wrong answers, and they must pass the same
+`pnpm validate:content` checks before they appear.
+
 ## Questions
 
 ### How are the challenges made?
@@ -215,6 +219,7 @@ Your build tasks are in [docs/TASKS.md](docs/TASKS.md).
 | `content/challenges` | One folder per challenge |
 | `content/projects` | Build by Learning projects: decisions, steps, behaviour checks, references ([plan](docs/BUILD-BY-LEARNING.md)) |
 | `.claude/skills/daily-challenge` | The `/daily-challenge` generator |
+| `.claude/skills/build-step` | The `/build-step` generator for Build by Learning content |
 | `scripts/autostart.mjs` | Starts the app at login (macOS) |
 
 </details>
