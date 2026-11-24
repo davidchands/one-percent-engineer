@@ -95,7 +95,8 @@ in your own project folder, and **Run checks** starts your app and tests what it
 
 The first project is a reading list: a server, storage, input checking and a web page, in six
 milestones, with two decisions along the way (server library, then JSON file or SQLite). More details:
-[docs/BUILD-BY-LEARNING.md](docs/BUILD-BY-LEARNING.md).
+[docs/BUILD-BY-LEARNING.md](docs/BUILD-BY-LEARNING.md). In VS Code, the **Build** panel shows your
+current step and runs the checks without leaving the editor.
 
 ## New challenges on demand
 

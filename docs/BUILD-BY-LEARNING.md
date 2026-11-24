@@ -4,8 +4,12 @@ Build one real full-stack app, one milestone at a time, learning each idea as yo
 When the project needs a technology choice, the app **teaches you the options and you decide**.
 It never chooses for you.
 
-Status: **PR 1 (foundation), PR 2 (server and the Build tab) and PR 3 (the reading-list project) are
-done.** Next is PR 4, the VS Code panel. The rest of this page is the approved plan.
+Status: **PR 1 (foundation), PR 2 (server and the Build tab), PR 3 (the reading-list project) and
+PR 4 (the VS Code Build panel) are done.** Next is PR 5, the optional `/build-step` skill. The rest of
+this page is the approved plan.
+
+**What PR 4 shipped:** a Build panel in the VS Code sidebar with the current step, Run checks, hints
+and Open project folder. Decisions and submitting stay in the web app.
 
 **What PR 3 shipped:** six milestones (server, add books, storage, input checking, change and
 remove, a page), two decisions (server framework; storage: JSON file or SQLite), six steps with

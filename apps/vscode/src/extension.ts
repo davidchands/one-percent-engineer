@@ -20,7 +20,8 @@ import type { AttemptResponse, ChallengePublic, TestRunResult, TodayResponse, In
 import { Api, ApiError } from "./api.ts";
 import { placeTaskComment, renderTaskComment, stripLeadingComment } from "./markers.ts";
 import { challengeDir, challengeIdForFile, expandHome } from "./paths.ts";
-import { TodayView } from "./view.ts";
+import { PanelView } from "./view.ts";
+import { activateBuild } from "./build.ts";
 
 export interface ViewState {
   status: "loading" | "offline" | "ready" | "error";
@@ -61,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
     notice: null,
   };
 
-  const view = new TodayView(context.extensionUri, (msg) => handleMessage(msg));
+  const view = new PanelView(context.extensionUri, (msg) => handleMessage(msg));
   context.subscriptions.push(vscode.window.registerWebviewViewProvider("onePercent.today", view, { webviewOptions: { retainContextWhenHidden: true } }));
 
   /* -------------------------- status bar -------------------------- */
@@ -434,6 +435,8 @@ export function activate(context: vscode.ExtensionContext) {
     if (!state.busy) refresh(currentId ?? undefined);
   }, 30_000);
   context.subscriptions.push({ dispose: () => clearInterval(poll) });
+
+  activateBuild(context, api, { webUrl: () => cfg().get<string>("webUrl", "http://127.0.0.1:4100") });
 
   refresh();
 }

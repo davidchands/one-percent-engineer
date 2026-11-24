@@ -18,6 +18,7 @@ function createFakeVscode(config) {
     docs: [],
     edits: [],
     viewProvider: null,
+    views: {},
     onChange: null,
     /** Queued answers for prompts, consumed in order. */
     answers: { input: [], quick: [], modal: [], warn: [] },
@@ -31,6 +32,7 @@ function createFakeVscode(config) {
     Uri: {
       joinPath: (u, ...p) => ({ fsPath: path.join(u.fsPath, ...p) }),
       parse: (s) => ({ toString: () => s }),
+      file: (p) => ({ fsPath: p }),
     },
     Range: class {
       constructor(start, end) {
@@ -57,7 +59,7 @@ function createFakeVscode(config) {
       activeTextEditor: undefined,
       createOutputChannel: () => ({ appendLine() {}, dispose() {} }),
       createStatusBarItem: () => ({ show() {}, hide() {}, dispose() {} }),
-      registerWebviewViewProvider: (_id, provider) => ((rec.viewProvider = provider), disposable),
+      registerWebviewViewProvider: (id, provider) => ((rec.views[id] = provider), (id === "onePercent.today" && (rec.viewProvider = provider)), disposable),
       showInformationMessage: (message, ...rest) => {
         rec.info.push(message);
         const modal = rest[0] && typeof rest[0] === "object" && rest[0].modal;

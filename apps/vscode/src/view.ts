@@ -4,17 +4,17 @@
  */
 import * as vscode from "vscode";
 import { randomBytes } from "node:crypto";
-import type { ViewState } from "./extension.ts";
+export type Incoming = { type: string; command?: string; explanation?: string; usedOutsideHelp?: boolean };
 
-type Incoming = { type: string; command?: string; explanation?: string; usedOutsideHelp?: boolean };
-
-export class TodayView implements vscode.WebviewViewProvider {
+/** One sidebar panel: a webview that renders whatever state the extension sends it. */
+export class PanelView implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
-  private last?: ViewState;
+  private last?: unknown;
 
   constructor(
     private extensionUri: vscode.Uri,
     private onMessage: (msg: Incoming) => void,
+    private script = "panel.js",
   ) {}
 
   resolveWebviewView(view: vscode.WebviewView) {
@@ -23,7 +23,7 @@ export class TodayView implements vscode.WebviewViewProvider {
     view.webview.options = { enableScripts: true, localResourceRoots: [media] };
     const nonce = randomBytes(16).toString("base64");
     const css = view.webview.asWebviewUri(vscode.Uri.joinPath(media, "panel.css"));
-    const js = view.webview.asWebviewUri(vscode.Uri.joinPath(media, "panel.js"));
+    const js = view.webview.asWebviewUri(vscode.Uri.joinPath(media, this.script));
     view.webview.html = `<!doctype html>
 <html lang="en">
 <head>
@@ -41,7 +41,7 @@ export class TodayView implements vscode.WebviewViewProvider {
     if (this.last) this.update(this.last);
   }
 
-  update(state: ViewState) {
+  update(state: unknown) {
     this.last = state;
     this.view?.webview.postMessage({ type: "state", state });
   }
