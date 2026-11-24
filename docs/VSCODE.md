@@ -25,6 +25,20 @@ Then reload VS Code (Cmd+Shift+P → "Developer: Reload Window"). The server mus
 
 **Tip:** open `~/Documents/1pe-practice` as your VS Code workspace while training. It includes a `.vscode/settings.json` that turns off AI completions, so your solutions are your own.
 
+## Build panel
+
+Under **Today** there's a second panel, **Build**, for the Build by Learning projects. Start a
+project in the web app's Build tab first. Then the panel shows:
+
+- your current step: the task and what it must do,
+- **Start this step**, **Run checks** (starts your app from your project folder and tests what it
+  does, then lists each check with what failed and what your app printed), and **Hint**,
+- **Open project folder**, to open your project in VS Code.
+
+Decisions, lessons and the final explain-and-submit stay in the browser, where there's room to read
+and think: the panel has a button that opens the right page. The panel never reads your project's
+files; the server runs your app from the folder it already knows.
+
 ## Commands (Cmd+Shift+P → "1% Engineer")
 
 | Command | What it does |

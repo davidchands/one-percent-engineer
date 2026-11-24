@@ -16,7 +16,10 @@
       "activitybar": [{ "id": "onePercent", "title": "1% Engineer", "icon": "media/icon.svg" }]
     },
     "views": {
-      "onePercent": [{ "type": "webview", "id": "onePercent.today", "name": "Today" }]
+      "onePercent": [
+        { "type": "webview", "id": "onePercent.today", "name": "Today" },
+        { "type": "webview", "id": "onePercent.build", "name": "Build" }
+      ]
     },
     "commands": [
       { "command": "onePercent.refresh", "title": "Refresh", "category": "1% Engineer", "icon": "$(refresh)" },
@@ -29,10 +32,18 @@
       { "command": "onePercent.insertTaskComment", "title": "Insert/Update Task Comment in Current File", "category": "1% Engineer" },
       { "command": "onePercent.toggleTracking", "title": "Pause/Resume Activity Tracking", "category": "1% Engineer" },
       { "command": "onePercent.showCollectedData", "title": "Show Data Collected This Session", "category": "1% Engineer" },
-      { "command": "onePercent.openInBrowser", "title": "Open Challenge in Browser", "category": "1% Engineer" }
+      { "command": "onePercent.openInBrowser", "title": "Open Challenge in Browser", "category": "1% Engineer" },
+      { "command": "onePercent.build.run", "title": "Build: Run Checks on My Project", "category": "1% Engineer", "icon": "$(beaker)" },
+      { "command": "onePercent.build.start", "title": "Build: Start This Step", "category": "1% Engineer" },
+      { "command": "onePercent.build.hint", "title": "Build: Reveal Next Hint", "category": "1% Engineer" },
+      { "command": "onePercent.build.openFolder", "title": "Build: Open My Project Folder", "category": "1% Engineer" },
+      { "command": "onePercent.build.openInBrowser", "title": "Build: Open This Step in the Browser", "category": "1% Engineer" },
+      { "command": "onePercent.build.refresh", "title": "Build: Refresh", "category": "1% Engineer", "icon": "$(refresh)" }
     ],
     "menus": {
       "view/title": [
+        { "command": "onePercent.build.run", "when": "view == onePercent.build", "group": "navigation@1" },
+        { "command": "onePercent.build.refresh", "when": "view == onePercent.build", "group": "navigation@2" },
         { "command": "onePercent.runTests", "when": "view == onePercent.today", "group": "navigation@1" },
         { "command": "onePercent.refresh", "when": "view == onePercent.today", "group": "navigation@2" }
       ]

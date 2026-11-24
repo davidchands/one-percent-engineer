@@ -6,6 +6,11 @@ import type {
   AttemptResponse,
   AttemptSummary,
   ChallengePublic,
+  ProjectCheckResult,
+  ProjectSummary,
+  ProjectView,
+  StepAttemptView,
+  StepView,
   SubmitResponse,
   TestRunResult,
   TodayResponse,
@@ -57,4 +62,15 @@ export class Api {
       provenance: kind === "first_edit" ? "observed" : "manual",
       payload: { client: "vscode" },
     });
+
+  // Build by Learning
+  projects = () => this.call<ProjectSummary[]>("GET", "/projects");
+  project = (id: string) => this.call<ProjectView>("GET", `/projects/${encodeURIComponent(id)}`);
+  step = (projectId: string, id: string) =>
+    this.call<StepView>("GET", `/projects/${encodeURIComponent(projectId)}/steps/${encodeURIComponent(id)}`);
+  startStep = (projectId: string, id: string) =>
+    this.call<StepAttemptView>("POST", `/projects/${encodeURIComponent(projectId)}/steps/${encodeURIComponent(id)}/attempts`);
+  stepHint = (attemptId: number) => this.call<StepAttemptView>("POST", `/step-attempts/${attemptId}/hints`);
+  stepRun = (attemptId: number) => this.call<ProjectCheckResult>("POST", `/step-attempts/${attemptId}/run`);
+  stepAttempt = (attemptId: number) => this.call<StepAttemptView>("GET", `/step-attempts/${attemptId}`);
 }

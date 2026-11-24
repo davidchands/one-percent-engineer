@@ -205,3 +205,84 @@ test("daily loop through the extension", async (t) => {
     assert.deepEqual(rec.errors, []);
   });
 });
+
+test("build loop through the extension", async (t) => {
+  const base = `http://127.0.0.1:${port}/api`;
+  const post = async (p, body) => {
+    const res = await fetch(base + p, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body ?? {}) });
+    assert.ok(res.ok, `${p}: ${res.status} ${await res.clone().text()}`);
+    return res.json();
+  };
+  const folder = path.join(tmp, "my-reading-list");
+  const config = { serverUrl: `http://127.0.0.1:${port}`, webUrl: "http://127.0.0.1:5173", challengesDir: practice, trackingEnabled: true };
+  const { vscode, rec } = createFakeVscode(config);
+  const ext = loadExtension(vscode);
+  const context = { subscriptions: [], extensionUri: { fsPath: EXT_DIR }, workspaceState: memento(), globalState: memento() };
+  ext.activate(context);
+  t.after(() => context.subscriptions.forEach((d) => d.dispose?.()));
+  const build = attachFakeWebview(rec.views["onePercent.build"]);
+  const cmd = (id) => rec.commands[id]();
+  const ready = async (pred) => {
+    for (let i = 0; i < 80 && !pred(build.latest()); i++) await wait(100);
+    assert.ok(pred(build.latest()), "panel reached the expected state");
+    return build.latest();
+  };
+
+  await t.test("before a project is started the panel says so", async () => {
+    const s = await ready((x) => x?.status === "ready");
+    assert.equal(s.project, null);
+  });
+
+  await t.test("after a decision, the panel shows the first step", async () => {
+    await post("/projects/reading-list/start", { folder });
+    await cmd("onePercent.build.refresh");
+    let s = await ready((x) => x?.project?.id === "reading-list");
+    assert.deepEqual(s.next, { kind: "decision", id: "server-framework" }, "a decision comes first, made in the browser");
+    await post("/projects/reading-list/decisions/server-framework", {
+      optionId: "node-http",
+      reason: "I want to see how a server really works before I use a library that hides it.",
+      weights: {},
+    });
+    await cmd("onePercent.build.refresh");
+    s = await ready((x) => x?.next?.kind === "step");
+    assert.equal(s.step.id, "first-route");
+    assert.equal(s.attempt, null);
+  });
+
+  await t.test("start, then run checks against the learner's own folder", async () => {
+    await cmd("onePercent.build.run").catch(() => {}); // not started yet: shown as a notice
+    assert.ok(rec.errors.some((e) => /Start this step first/.test(e)));
+    rec.errors.length = 0;
+    await cmd("onePercent.build.start");
+    let s = await ready((x) => x?.attempt);
+    assert.equal(s.attempt.status, "in_progress");
+
+    await cmd("onePercent.build.run");
+    s = build.latest();
+    assert.ok(s.lastCheck.failed > 0, "an empty project fails");
+    assert.equal(s.lastCheck.startup, "no_start_script");
+
+    const ref = path.join(REPO, "content/projects/reading-list/steps/first-route/reference/node-http");
+    for (const f of fs.readdirSync(ref)) fs.copyFileSync(path.join(ref, f), path.join(folder, f));
+    await cmd("onePercent.build.run");
+    s = build.latest();
+    assert.equal(s.lastCheck.failed, 0, JSON.stringify(s.lastCheck.cases.filter((c) => !c.passed)));
+    assert.ok(s.lastCheck.passed > 0);
+  });
+
+  await t.test("hints are revealed one at a time", async () => {
+    await cmd("onePercent.build.hint");
+    assert.equal(build.latest().attempt.hints.length, 1);
+  });
+
+  await t.test("the folder opens through VS Code and the browser link names the step", async () => {
+    const opened = [];
+    const exec = vscode.commands.executeCommand;
+    vscode.commands.executeCommand = async (id, ...a) => (id === "vscode.openFolder" ? opened.push(a[0].fsPath) : exec(id, ...a));
+    await cmd("onePercent.build.openFolder");
+    assert.deepEqual(opened, [build.latest().project.folder]);
+    assert.equal(path.basename(opened[0]), "my-reading-list");
+  });
+
+  await t.test("no error messages were shown along the way", () => assert.deepEqual(rec.errors, []));
+});
