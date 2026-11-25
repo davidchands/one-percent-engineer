@@ -100,6 +100,10 @@ commonMistakes:
 explanationCheckpoint: Explain, for [10, 20, 20, 30] and a limit of 20, how low and high change on
   each step. Then state your time complexity for one call, and why it is so much smaller than
   scanning.
+interview:
+  pattern: dsa.binary-search
+  timeComplexity: O(log n)
+  spaceComplexity: O(1)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

@@ -116,6 +116,10 @@ commonMistakes:
 explanationCheckpoint: Explain why the first time your search reaches the destination is by the
   fewest connections. Then state your time complexity in terms of stops and connections, and what
   the visited Set costs in memory.
+interview:
+  pattern: dsa.graphs
+  timeComplexity: O(n)
+  spaceComplexity: O(n)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

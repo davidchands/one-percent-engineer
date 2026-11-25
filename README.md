@@ -102,7 +102,11 @@ current step and runs the checks without leaving the editor.
 
 A track of 25 skills (hash maps, two pointers, trees, graphs, dynamic programming and more) with
 problems where **speed is part of the test**: a correct but slow answer fails, as it would in an
-interview. Each problem teaches the pattern first. Details: [docs/DSA.md](docs/DSA.md).
+interview. Each problem teaches the pattern first.
+
+**Interview mode** asks you to name the technique and its time and memory cost *before* you code, can
+run a 20 to 45 minute countdown, and the **Interview** tab shows your pattern map and brings solved
+problems back for review (after 1, 3, 7, 14, 30 and 60 days). Details: [docs/DSA.md](docs/DSA.md).
 
 ## New challenges on demand
 

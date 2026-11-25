@@ -8,7 +8,7 @@ import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z, ZodError } from "zod";
-import { DecideRequest, NewEvent, NewJournalEntry, RunRequest, StartProjectRequest, StepSubmitRequest, SubmitRequest } from "@1pe/contracts";
+import { DecideRequest, InterviewStartRequest, NewEvent, PlanRequest, NewJournalEntry, RunRequest, StartProjectRequest, StepSubmitRequest, SubmitRequest } from "@1pe/contracts";
 import { openDb } from "./db.ts";
 import { loadContent } from "./content.ts";
 import * as svc from "./services.ts";
@@ -53,6 +53,13 @@ export function buildApp(ctx: svc.Ctx) {
   app.post("/api/attempts/:id/submit", async (req) =>
     svc.submit(ctx, idParam.parse(req.params).id, SubmitRequest.parse(req.body)),
   );
+  app.post("/api/attempts/:id/plan", async (req) =>
+    svc.commitPlan(ctx, idParam.parse(req.params).id, PlanRequest.parse(req.body)),
+  );
+  app.post("/api/attempts/:id/interview", async (req) =>
+    svc.startInterview(ctx, idParam.parse(req.params).id, InterviewStartRequest.parse(req.body)),
+  );
+  app.get("/api/interview", async () => svc.interviewOverview(ctx));
   app.post("/api/attempts/:id/solution", async (req) =>
     svc.revealSolution(ctx, idParam.parse(req.params).id, z.object({ confirm: z.boolean() }).parse(req.body).confirm),
   );

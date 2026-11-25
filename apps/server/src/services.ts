@@ -16,8 +16,14 @@ import {
   projectSkillState,
   selectNextActivity,
 } from "@1pe/core";
+import { ComplexityClass, type PlanRequest, type InterviewStartRequest } from "@1pe/contracts";
 import type {
   ChallengePublic,
+  InterviewOverview,
+  InterviewTimer,
+  PlanResult,
+  ReviewItem,
+  PatternRow,
   Evidence,
   JournalEntry,
   NewEvent,
@@ -103,9 +109,26 @@ function getChallenge(ctx: Ctx, id: string): LoadedChallenge {
   return ch;
 }
 
-export function toPublic(ch: LoadedChallenge): ChallengePublic {
-  const { hints, ...rest } = ch.meta;
-  return { ...rest, hintCount: hints.length, starterCode: ch.starter, publicTests: ch.publicTests };
+export function toPublic(ch: LoadedChallenge, ctx?: Ctx): ChallengePublic {
+  const { hints, interview, ...rest } = ch.meta;
+  return {
+    ...rest,
+    hintCount: hints.length,
+    starterCode: ch.starter,
+    publicTests: ch.publicTests,
+    planOptions: interview && ctx ? planOptions(ctx) : null,
+  };
+}
+
+/** Every algorithm technique you can name when planning. The right one is never marked. */
+function planOptions(ctx: Ctx) {
+  return {
+    patterns: [...ctx.content.skills.values()]
+      .filter((s) => s.id.startsWith("dsa.") && s.id !== "dsa.complexity")
+      .map((s) => ({ id: s.id, name: s.name }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    complexities: ComplexityClass.options,
+  };
 }
 
 /**
@@ -141,7 +164,7 @@ export function listChallenges(ctx: Ctx) {
 }
 
 export function getChallengePublic(ctx: Ctx, id: string) {
-  return toPublic(getChallenge(ctx, id));
+  return toPublic(getChallenge(ctx, id), ctx);
 }
 
 /* ------------------------------------------------------------------ */
@@ -343,6 +366,139 @@ export function getAttempt(ctx: Ctx, id: number) {
         }
       : null,
     metrics: attemptMetrics(row, evs, now(ctx)),
+    plan: planOf(ctx, ch, evs),
+    interview: interviewOf(row, evs),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Interview mode: plan before you code, an optional countdown         */
+/* ------------------------------------------------------------------ */
+
+function planOf(ctx: Ctx, ch: LoadedChallenge, evs: ReturnType<typeof events>): PlanResult | null {
+  const e = evs.find((x) => x.kind === "plan_committed");
+  const answer = ch.meta.interview;
+  if (!e || !answer) return null;
+  const p = e.payload as { pattern: string; timeComplexity: string; spaceComplexity: string };
+  return {
+    pattern: p.pattern,
+    timeComplexity: p.timeComplexity,
+    spaceComplexity: p.spaceComplexity,
+    patternCorrect: p.pattern === answer.pattern,
+    timeCorrect: p.timeComplexity === answer.timeComplexity,
+    spaceCorrect: p.spaceComplexity === answer.spaceComplexity,
+    answer: {
+      pattern: answer.pattern,
+      patternName: ctx.content.skills.get(answer.pattern)?.name ?? answer.pattern,
+      timeComplexity: answer.timeComplexity,
+      spaceComplexity: answer.spaceComplexity,
+    },
+    committedAt: e.ts,
+  };
+}
+
+function interviewOf(row: AttemptRow, evs: ReturnType<typeof events>): InterviewTimer | null {
+  const e = evs.find((x) => x.kind === "interview_started");
+  if (!e) return null;
+  const minutes = Number((e.payload as { minutes?: number }).minutes);
+  const startedAt = e.ts;
+  const finishedWithin = row.ended_at && row.status === "passed"
+    ? new Date(row.ended_at).getTime() - new Date(startedAt).getTime() <= minutes * 60_000
+    : null;
+  return { minutes, startedAt, finishedWithin };
+}
+
+/** Commit your plan once per attempt. The answer is revealed only after this, so you can't peek first. */
+export function commitPlan(ctx: Ctx, attemptId: number, req: PlanRequest) {
+  const row = getAttemptRow(ctx, attemptId);
+  requireOpen(row);
+  const ch = getChallenge(ctx, row.challenge_id);
+  if (!ch.meta.interview) throw new ServiceError(400, "This problem has no planning step.");
+  if (!ctx.content.skills.has(req.pattern) || !req.pattern.startsWith("dsa.")) {
+    throw new ServiceError(400, `"${req.pattern}" isn't a technique you can choose.`);
+  }
+  if (events(ctx, attemptId).some((e) => e.kind === "plan_committed")) {
+    throw new ServiceError(409, "You've already committed a plan for this attempt.");
+  }
+  addEvent(ctx, attemptId, {
+    kind: "plan_committed",
+    provenance: "manual",
+    payload: { pattern: req.pattern, timeComplexity: req.timeComplexity, spaceComplexity: req.spaceComplexity },
+  });
+  return getAttempt(ctx, attemptId);
+}
+
+export function startInterview(ctx: Ctx, attemptId: number, req: InterviewStartRequest) {
+  const row = getAttemptRow(ctx, attemptId);
+  requireOpen(row);
+  if (events(ctx, attemptId).some((e) => e.kind === "interview_started")) {
+    throw new ServiceError(409, "The interview timer is already running for this attempt.");
+  }
+  addEvent(ctx, attemptId, { kind: "interview_started", provenance: "observed", payload: { minutes: req.minutes } });
+  return getAttempt(ctx, attemptId);
+}
+
+/** Days until a problem comes back, after its 1st, 2nd, 3rd... pass. */
+export const REVIEW_DAYS = [1, 3, 7, 14, 30, 60];
+
+export function interviewOverview(ctx: Ctx): InterviewOverview {
+  const at = now(ctx);
+  const dsa = [...ctx.content.challenges.values()].filter((c) => c.meta.interview);
+  const rows = ctx.db
+    .prepare("SELECT id, challenge_id, status, ended_at, started_at FROM attempts")
+    .all() as { id: number; challenge_id: string; status: string; ended_at: string | null; started_at: string }[];
+
+  const patterns = new Map<string, PatternRow>();
+  for (const s of ctx.content.skills.values()) {
+    if (!s.id.startsWith("dsa.") || s.id === "dsa.complexity") continue;
+    patterns.set(s.id, { skillId: s.id, name: s.name, problems: 0, passed: 0, plans: 0, patternRight: 0, timeRight: 0, spaceRight: 0, lastPracticed: null });
+  }
+  const review: ReviewItem[] = [];
+  const missed = new Map<string, number>();
+
+  for (const ch of dsa) {
+    const mine = rows.filter((r) => r.challenge_id === ch.meta.id);
+    const passes = mine.filter((r) => r.status === "passed" && r.ended_at).sort((a, b) => a.ended_at!.localeCompare(b.ended_at!));
+    const row = patterns.get(ch.meta.interview!.pattern);
+    if (row) {
+      row.problems++;
+      if (passes.length) row.passed++;
+      for (const a of mine) {
+        row.lastPracticed = [row.lastPracticed, a.started_at].filter(Boolean).sort().pop() ?? null;
+        const plan = planOf(ctx, ch, events(ctx, a.id));
+        if (!plan) continue;
+        row.plans++;
+        if (plan.patternCorrect) row.patternRight++;
+        else missed.set(row.skillId, (missed.get(row.skillId) ?? 0) + 1);
+        if (plan.timeCorrect) row.timeRight++;
+        if (plan.spaceCorrect) row.spaceRight++;
+      }
+    }
+    if (passes.length) {
+      const last = passes[passes.length - 1]!;
+      const days = REVIEW_DAYS[Math.min(passes.length, REVIEW_DAYS.length) - 1]!;
+      const dueAt = new Date(new Date(last.ended_at!).getTime() + days * 86_400_000);
+      review.push({
+        challengeId: ch.meta.id,
+        title: ch.meta.title,
+        pattern: ch.meta.interview!.pattern,
+        timesPassed: passes.length,
+        lastPassedAt: last.ended_at!,
+        dueAt: dueAt.toISOString(),
+        due: dueAt.getTime() <= at.getTime(),
+      });
+    }
+  }
+  review.sort((a, b) => a.dueAt.localeCompare(b.dueAt));
+
+  const weakestPatterns = [...missed.entries()]
+    .map(([skillId, n]) => ({ skillId, name: patterns.get(skillId)!.name, missed: n, plans: patterns.get(skillId)!.plans }))
+    .sort((a, b) => b.missed - a.missed || a.name.localeCompare(b.name));
+
+  return {
+    patterns: [...patterns.values()].sort((a, b) => a.name.localeCompare(b.name)),
+    review,
+    weakestPatterns,
   };
 }
 

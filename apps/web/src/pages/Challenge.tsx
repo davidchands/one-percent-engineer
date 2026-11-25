@@ -4,6 +4,7 @@ import { api, type Attempt, type SubmitResult } from "../api.ts";
 import { Button, Card, Difficulty, ErrorNote, Label, Pill, Provenance, cx, formatMs, useLoad, useTick } from "../components/ui.tsx";
 import { go } from "../App.tsx";
 import { ServerDown } from "./Today.tsx";
+import { InterviewPanel } from "./Interview.tsx";
 
 const draftKey = (attemptId: number) => `1pe:draft:${attemptId}`;
 const readDraft = (id: number) => {
@@ -409,6 +410,7 @@ function Workspace({
 
   return (
     <>
+      <InterviewPanel ch={ch} attempt={attempt} onAttempt={onAttempt} />
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
           <span className="font-mono text-xs text-muted">solution.js</span>
@@ -610,6 +612,7 @@ function Finished({ ch, attempt, onRetry }: { ch: ChallengePublic; attempt: Atte
           <Button onClick={onRetry}>New attempt</Button>
         </div>
       </Card>
+      <InterviewPanel ch={ch} attempt={attempt} onAttempt={() => {}} />
       {attempt.lastSubmission && (
         <>
           <Results run={attempt.lastSubmission.results} />

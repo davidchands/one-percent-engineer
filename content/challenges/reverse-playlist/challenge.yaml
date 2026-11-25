@@ -97,6 +97,10 @@ commonMistakes:
   - Building new nodes, which is not reversing the same chain.
 explanationCheckpoint: Explain what previous, current and following are after the first and second
   loop for a → b → c. Then state your time and extra memory, and why no array is needed.
+interview:
+  pattern: dsa.linked-lists
+  timeComplexity: O(n)
+  spaceComplexity: O(1)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

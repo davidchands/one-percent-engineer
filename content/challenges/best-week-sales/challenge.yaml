@@ -92,6 +92,10 @@ commonMistakes:
   - Forgetting to throw the RangeError for a bad window size.
 explanationCheckpoint: Explain how you got the second window's total from the first. Then say your
   time complexity, and how it would change if you re-added every window.
+interview:
+  pattern: dsa.sliding-window
+  timeComplexity: O(n)
+  spaceComplexity: O(1)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.
