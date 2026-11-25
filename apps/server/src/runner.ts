@@ -79,10 +79,12 @@ async function runSuite(dir: string, file: string, source: string, hidden: boole
   if (cases.length === 0) {
     // Nothing ran: syntax error, missing export, timeout before any test finished...
     cases.push({
-      name: hidden ? "hidden suite could not run" : "test suite could not run",
+      name: timedOut
+        ? `${hidden ? "hidden tests" : "tests"} ran out of time (${TIMEOUT_MS / 1000}s)`
+        : hidden ? "hidden suite could not run" : "test suite could not run",
       passed: false,
       hidden,
-      message: timedOut ? `Timed out after ${TIMEOUT_MS / 1000}s. Infinite loop?` : firstErrorLine(stderr),
+      message: timedOut ? `Stopped after ${TIMEOUT_MS / 1000}s. Either an infinite loop, or code that is correct but too slow on a big input: look for work repeated for every item that could be done once.` : firstErrorLine(stderr),
     });
   }
   return { cases, timedOut, stderr: hidden ? "" : stderr.trim() };

@@ -1,0 +1,104 @@
+id: merge-bookings
+title: Merging overlapping room bookings
+type: algorithm
+difficulty: 3
+sequence: 13
+context: hotel
+skills:
+  - dsa.intervals
+  - dsa.sorting
+targetLevel: 3
+objective: Sort intervals by start, then merge neighbours in one pass, extending the end correctly.
+lesson:
+  concept: Sort intervals by start and the ones that overlap end up next to each other
+  realWorldProblem: A conference hall is booked in time slots, entered in whatever order people asked.
+    The manager wants one clean list of the times the hall is in use, so overlapping bookings show
+    as one block.
+  whyItExists: Comparing every booking with every other one is slow and messy. Once the bookings are
+    sorted by start time, a booking can only overlap the ones right before it, so one pass is
+    enough.
+  howItWorks: "Sort by start. Keep a list of merged blocks. For each booking: if it starts after the
+    last block ends, it is separate, so add it as a new block. Otherwise it overlaps (or touches),
+    so extend the last block's end to the later of the two ends. Taking the later end matters,
+    because a booking can sit completely inside another one."
+  example:
+    code: |-
+      function mergeSpans(spans) {
+        const sorted = [...spans].sort((a, b) => a[0] - b[0]);
+        const merged = [];
+        for (const [start, end] of sorted) {
+          const last = merged[merged.length - 1];
+          if (last && start <= last[1]) last[1] = Math.max(last[1], end);
+          else merged.push([start, end]);
+        }
+        return merged;
+      }
+
+      mergeSpans([[5, 8], [1, 4], [3, 6]]); // [[1, 8]]
+    explanation: "Sorted: [1,4], [3,6], [5,8]. 3 starts before the first block ends (4), so it extends
+      to 6. Then 5 starts before 6, so it extends to 8. One block remains: [1, 8]. Note that
+      [...spans] copies the list before sorting, so the original order is left alone."
+  predict:
+    code: console.log([10, 9, 1, 100].sort());
+    question: What does this print?
+    answer: "[ 1, 10, 100, 9 ]"
+    why: Without a comparison function, sort() compares the values as text. '10' comes before '9'
+      because '1' comes before '9'. Always pass (a, b) => a - b for numbers.
+  commonMistake: Setting the block's end to the new booking's end. If [1, 10] is followed by [2, 3],
+    that shrinks the block to [1, 3] and loses seven hours of the booking.
+problem: |-
+  Write `mergeBookings(bookings)` and export it from solution.js. Each booking is `[start, end]`, whole numbers, with `start` smaller than `end`. The list is in any order.
+
+  Return a new list of merged blocks, sorted by start. Bookings that overlap are merged. Bookings that only touch (one ends at the exact moment the next starts) are merged too.
+requirements:
+  - Return the merged blocks as [start, end] pairs, sorted by start.
+  - Overlapping bookings become one block that runs from the earliest start to the latest end.
+  - A booking that ends exactly when another starts is merged with it.
+  - A booking completely inside another one disappears into it.
+  - Return an empty list for an empty list.
+  - Finish in well under half a second for 200,000 bookings.
+constraints:
+  - Don't change the list you are given, or the pairs inside it.
+  - "Sort numbers with a comparison function: (a, b) => a - b."
+examples:
+  - input: mergeBookings([[1, 3], [2, 6], [8, 10]])
+    output: "[[1, 6], [8, 10]]"
+  - input: mergeBookings([[5, 8], [1, 5]])
+    output: "[[1, 8]]"
+    note: They touch at 5.
+  - input: mergeBookings([[1, 10], [2, 3]])
+    output: "[[1, 10]]"
+edgeCasesToConsider:
+  - The bookings arrive out of order?
+  - One booking inside another?
+  - Two bookings that touch?
+  - An empty list, or a single booking?
+beforeCoding:
+  - Sort [[8, 10], [1, 3], [2, 6]] by start. Which bookings can overlap which?
+  - When a new booking overlaps the last block, what is the block's new end?
+hints:
+  - If the bookings were in order of start time, which earlier bookings could a new booking possibly
+    overlap?
+  - Sort a COPY by start with (a, b) => a[0] - b[0]. Then keep a list of blocks and compare each
+    booking with the last block only.
+  - When they overlap, the new end is whichever end is later. A booking can finish before the block
+    does.
+  - "Shape: const sorted = [...bookings].sort(___); const merged = []; for (const [start, end] of
+    sorted) { const last = merged[merged.length - 1]; if (last && start <= last[1]) last[1] =
+    Math.max(___, ___); else merged.push([start, end]); } return merged;"
+commonMistakes:
+  - Not sorting first, so overlaps that aren't next to each other are missed.
+  - Setting the end to the new booking's end instead of the later of the two ends.
+  - Using < instead of <=, so bookings that touch stay separate.
+  - Sorting the input list, or changing the pairs inside it.
+  - Sorting numbers without a comparison function, which orders them as text.
+explanationCheckpoint: Explain, for [[8, 10], [1, 3], [2, 6]], what the list of blocks looks like
+  after each booking. Then state the time complexity, and say which step costs the most.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

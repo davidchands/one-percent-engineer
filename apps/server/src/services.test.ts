@@ -58,6 +58,21 @@ test("the sandbox kills infinite loops", async () => {
   assert.equal(r.passed, 0);
 });
 
+test("code that finishes some tests and then hangs is a failure, not a pass", async () => {
+  const { runTests } = await import("./runner.ts");
+  const publicTests = [
+    'import { test } from "node:test";',
+    'import assert from "node:assert/strict";',
+    'import { f } from "./solution.js";',
+    'test("small input", () => assert.equal(f(1), 1));',
+    'test("big input", () => assert.equal(f(1e9), 1e9));',
+  ].join("\n");
+  const r = await runTests("export function f(n){ if (n > 5) { while(true){} } return n; }", { publicTests });
+  assert.equal(r.timedOut, true);
+  assert.ok(r.failed >= 1, "the unfinished work counts as a failure");
+  assert.match(r.cases[0]!.message ?? "", /too slow/);
+});
+
 test("viewing the solution needs confirmation and is recorded", async () => {
   const ctx = fresh();
   const a = svc.startAttempt(ctx, "inventory-stock");
