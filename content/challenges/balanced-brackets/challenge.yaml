@@ -96,6 +96,10 @@ commonMistakes:
   - Popping an empty stack and comparing undefined, which sometimes looks right by accident.
 explanationCheckpoint: Explain what the stack holds after each character of '{[()]}'. Then say the
   time complexity of your solution, and the most memory it can use.
+interview:
+  pattern: dsa.stacks
+  timeComplexity: O(n)
+  spaceComplexity: O(n)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

@@ -68,6 +68,8 @@ export function loadContent(dir = CONTENT_DIR): Content {
     for (const s of parsed.data.skills) {
       if (!skills.has(s)) throw new Error(`challenge ${id}: unknown skill ${s}`);
     }
+    const pattern = parsed.data.interview?.pattern;
+    if (pattern && !skills.has(pattern)) throw new Error(`challenge ${id}: interview pattern ${pattern} is not a skill`);
     const read = (f: string) => readFileSync(join(d, f), "utf8");
     const wrongDir = join(d, "wrong");
     challenges.set(id, {

@@ -102,6 +102,10 @@ commonMistakes:
 explanationCheckpoint: Explain what best[4] holds for coins [1, 3, 4], and which earlier entries it
   was built from. Then state your time and memory use, and say why remembering answers turns the
   recursive version from impossible to fast.
+interview:
+  pattern: dsa.dp-1d
+  timeComplexity: O(n × k)
+  spaceComplexity: O(n)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

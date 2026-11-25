@@ -8,6 +8,7 @@ import { JournalPage } from "./pages/Journal.tsx";
 import { BuildPage, ProjectPage } from "./pages/Build.tsx";
 import { DecisionPage } from "./pages/Decision.tsx";
 import { StepPage } from "./pages/Step.tsx";
+import { InterviewPage } from "./pages/Interview.tsx";
 
 /** Tiny hash router: #/path?query. Enough for a local tool; no dependency to learn yet. */
 function useHashRoute() {
@@ -36,6 +37,7 @@ const NAV = [
   { to: "/", label: "Today" },
   { to: "/challenges", label: "Challenges" },
   { to: "/build", label: "Build" },
+  { to: "/interview", label: "Interview" },
   { to: "/skills", label: "Skills" },
   { to: "/journal", label: "Journal" },
 ];
@@ -51,6 +53,7 @@ export function App() {
   else if (seg[0] === "build" && seg[1] && seg[2] === "step" && seg[3]) page = <StepPage projectId={seg[1]} id={seg[3]} />;
   else if (seg[0] === "build" && seg[1]) page = <ProjectPage id={seg[1]} />;
   else if (seg[0] === "build") page = <BuildPage />;
+  else if (seg[0] === "interview") page = <InterviewPage />;
   else if (seg[0] === "skills") page = <SkillsPage />;
   else if (seg[0] === "journal") page = <JournalPage entryId={seg[1]} attemptId={query.get("attempt")} title={query.get("title")} />;
   else page = <TodayPage />;

@@ -87,6 +87,19 @@ export const Lesson = z.object({
 });
 export type Lesson = z.infer<typeof Lesson>;
 
+/** The answers a learner chooses between when they plan an interview-style problem. */
+export const ComplexityClass = z.enum(["O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n²)", "O(n × k)", "O(2ⁿ)"]);
+export type ComplexityClass = z.infer<typeof ComplexityClass>;
+
+/** Interview-style problems: the pattern and the cost of the best solution. Never sent to the client. */
+export const InterviewMeta = z.object({
+  /** The skill id of the technique that solves it, such as dsa.two-pointers. */
+  pattern: z.string(),
+  timeComplexity: ComplexityClass,
+  spaceComplexity: ComplexityClass,
+});
+export type InterviewMeta = z.infer<typeof InterviewMeta>;
+
 export const ChallengeMeta = z.object({
   id: z.string(),
   title: z.string(),
@@ -108,13 +121,21 @@ export const ChallengeMeta = z.object({
   hints: z.array(z.string()).min(3),
   commonMistakes: z.array(z.string()),
   explanationCheckpoint: z.string(),
+  interview: InterviewMeta.optional(),
   rubric: z.array(z.object({ criterion: z.string(), description: z.string() })),
 });
 export type ChallengeMeta = z.infer<typeof ChallengeMeta>;
 
 /** What the client is allowed to see. No hidden tests, no solution. */
-export const ChallengePublic = ChallengeMeta.omit({ hints: true }).extend({
+export const ChallengePublic = ChallengeMeta.omit({ hints: true, interview: true }).extend({
   hintCount: z.number().int(),
+  /** Set for interview-style problems: what you can choose from when you plan before coding. */
+  planOptions: z
+    .object({
+      patterns: z.array(z.object({ id: z.string(), name: z.string() })),
+      complexities: z.array(ComplexityClass),
+    })
+    .nullable(),
   starterCode: z.string(),
   publicTests: z.string(),
 });
@@ -143,6 +164,8 @@ export const EventKind = z.enum([
   "timer_start",
   "timer_pause",
   "first_edit",
+  "plan_committed",
+  "interview_started",
 ]);
 export type EventKind = z.infer<typeof EventKind>;
 
@@ -170,6 +193,16 @@ export const TestRunResult = z.object({
   stderr: z.string(),
 });
 export type TestRunResult = z.infer<typeof TestRunResult>;
+
+export const PlanRequest = z.object({
+  pattern: z.string(),
+  timeComplexity: ComplexityClass,
+  spaceComplexity: ComplexityClass,
+});
+export type PlanRequest = z.infer<typeof PlanRequest>;
+
+export const InterviewStartRequest = z.object({ minutes: z.number().int().min(5).max(120) });
+export type InterviewStartRequest = z.infer<typeof InterviewStartRequest>;
 
 export const RunRequest = z.object({ code: z.string().max(100_000) });
 

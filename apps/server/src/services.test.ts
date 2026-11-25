@@ -152,3 +152,106 @@ test("no daily limit: passing today's challenge moves today on to the next one",
   assert.deepEqual(after.stats.passedToday.map((c) => c.id), [first]);
   assert.equal(svc.today(ctx).primary?.challenge.id, after.primary?.challenge.id, "and it's stable until that one is passed");
 });
+
+/* ------------------------------------------------------------------ */
+/* Interview mode                                                      */
+/* ------------------------------------------------------------------ */
+
+const EXPLANATION = "I kept a Map of what I had seen so far, so each price needs one lookup instead of a search.";
+
+test("interview problems offer a plan to make, and never leak the answer", () => {
+  const pub = svc.getChallengePublic(fresh(), "pair-for-sale") as Record<string, unknown>;
+  assert.ok(!("interview" in pub), "the answer is not in the public problem");
+  const options = pub.planOptions as { patterns: { id: string }[]; complexities: string[] };
+  assert.ok(options.patterns.some((p) => p.id === "dsa.two-pointers"));
+  assert.ok(!options.patterns.some((p) => p.id === "dsa.complexity" || p.id.startsWith("js.")));
+  assert.equal((svc.getChallengePublic(fresh(), "cart-total") as Record<string, unknown>).planOptions, null);
+});
+
+test("committing a plan reveals whether each part was right, once", () => {
+  const ctx = fresh();
+  const a = svc.startAttempt(ctx, "pair-for-sale");
+  assert.equal(a.plan, null);
+  const planned = svc.commitPlan(ctx, a.id, { pattern: "dsa.hash-maps", timeComplexity: "O(n)", spaceComplexity: "O(n)" });
+  assert.equal(planned.plan?.patternCorrect, false);
+  assert.equal(planned.plan?.timeCorrect, true);
+  assert.equal(planned.plan?.spaceCorrect, false, "two pointers needs no extra memory");
+  assert.equal(planned.plan?.answer.pattern, "dsa.two-pointers");
+  assert.equal(planned.plan?.answer.spaceComplexity, "O(1)");
+  assert.throws(() => svc.commitPlan(ctx, a.id, { pattern: "dsa.two-pointers", timeComplexity: "O(n)", spaceComplexity: "O(1)" }), /already committed/);
+});
+
+test("a plan needs an interview problem and a real technique", () => {
+  const ctx = fresh();
+  const plain = svc.startAttempt(ctx, "cart-total");
+  assert.throws(() => svc.commitPlan(ctx, plain.id, { pattern: "dsa.hash-maps", timeComplexity: "O(n)", spaceComplexity: "O(1)" }), /no planning step/);
+  const a = svc.startAttempt(ctx, "pair-for-sale");
+  assert.throws(() => svc.commitPlan(ctx, a.id, { pattern: "js.loops", timeComplexity: "O(n)", spaceComplexity: "O(1)" }), /isn't a technique/);
+});
+
+test("the interview countdown starts once and records whether you finished in time", async () => {
+  let clock = new Date("2026-03-01T10:00:00Z");
+  const ctx: svc.Ctx = { db: openDb(":memory:"), content, now: () => clock };
+  const a = svc.startAttempt(ctx, "pair-for-sale");
+  const started = svc.startInterview(ctx, a.id, { minutes: 30 });
+  assert.equal(started.interview?.minutes, 30);
+  assert.equal(started.interview?.finishedWithin, null);
+  assert.throws(() => svc.startInterview(ctx, a.id, { minutes: 45 }), /already running/);
+
+  clock = new Date("2026-03-01T10:20:00Z");
+  const ch = content.challenges.get("pair-for-sale")!;
+  const r = await svc.submit(ctx, a.id, { code: ch.solution, explanation: EXPLANATION, usedOutsideHelp: false });
+  assert.equal(r.allPassed, true);
+  assert.equal(r.attempt.interview?.finishedWithin, true);
+
+  const late: svc.Ctx = { db: openDb(":memory:"), content, now: () => clock };
+  clock = new Date("2026-03-01T11:00:00Z");
+  const b = svc.startAttempt(late, "pair-for-sale");
+  svc.startInterview(late, b.id, { minutes: 30 });
+  clock = new Date("2026-03-01T11:40:00Z");
+  const r2 = await svc.submit(late, b.id, { code: ch.solution, explanation: EXPLANATION, usedOutsideHelp: false });
+  assert.equal(r2.attempt.interview?.finishedWithin, false);
+});
+
+test("passed interview problems come back for review on a widening schedule", async () => {
+  let clock = new Date("2026-03-01T10:00:00Z");
+  const ctx: svc.Ctx = { db: openDb(":memory:"), content, now: () => clock };
+  const ch = content.challenges.get("pair-for-sale")!;
+  assert.deepEqual(svc.interviewOverview(ctx).review, []);
+
+  const first = svc.startAttempt(ctx, ch.meta.id);
+  svc.commitPlan(ctx, first.id, { pattern: "dsa.hash-maps", timeComplexity: "O(n)", spaceComplexity: "O(n)" });
+  clock = new Date("2026-03-01T10:30:00Z");
+  await svc.submit(ctx, first.id, { code: ch.solution, explanation: EXPLANATION, usedOutsideHelp: false });
+
+  let o = svc.interviewOverview(ctx);
+  assert.equal(o.review.length, 1);
+  assert.equal(o.review[0]!.timesPassed, 1);
+  assert.equal(o.review[0]!.due, false, "not due the moment you pass it");
+  assert.equal(o.review[0]!.dueAt, "2026-03-02T10:30:00.000Z", "back after 1 day");
+
+  clock = new Date("2026-03-02T11:00:00Z");
+  assert.equal(svc.interviewOverview(ctx).review[0]!.due, true);
+
+  const second = svc.startAttempt(ctx, ch.meta.id);
+  await svc.submit(ctx, second.id, { code: ch.solution, explanation: EXPLANATION, usedOutsideHelp: false });
+  o = svc.interviewOverview(ctx);
+  assert.equal(o.review[0]!.timesPassed, 2);
+  assert.equal(o.review[0]!.dueAt, "2026-03-05T11:00:00.000Z", "back after 3 days");
+});
+
+test("the pattern map counts how often you name each technique correctly", () => {
+  const ctx = fresh();
+  const a = svc.startAttempt(ctx, "pair-for-sale");
+  svc.commitPlan(ctx, a.id, { pattern: "dsa.hash-maps", timeComplexity: "O(n)", spaceComplexity: "O(n)" });
+  const b = svc.startAttempt(ctx, "best-week-sales");
+  svc.commitPlan(ctx, b.id, { pattern: "dsa.sliding-window", timeComplexity: "O(n)", spaceComplexity: "O(1)" });
+
+  const o = svc.interviewOverview(ctx);
+  const two = o.patterns.find((p) => p.skillId === "dsa.two-pointers")!;
+  assert.deepEqual([two.problems, two.plans, two.patternRight, two.timeRight, two.spaceRight], [1, 1, 0, 1, 0]);
+  const window = o.patterns.find((p) => p.skillId === "dsa.sliding-window")!;
+  assert.deepEqual([window.plans, window.patternRight, window.spaceRight], [1, 1, 1]);
+  assert.equal(o.weakestPatterns[0]?.skillId, "dsa.two-pointers");
+  assert.ok(o.patterns.every((p) => p.skillId !== "dsa.complexity"));
+});

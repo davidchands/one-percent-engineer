@@ -8,6 +8,8 @@ import type {
   ChallengePublic,
   ChallengeRow,
   DecisionView,
+  InterviewOverview,
+  PlanRequest,
   ProjectCheckResult,
   ProjectSummary,
   ProjectView,
@@ -55,6 +57,9 @@ export const api = {
   run: (id: number, code: string) => call<TestRunResult>("POST", `/attempts/${id}/run`, { code }),
   submit: (id: number, body: { code: string; explanation: string; usedOutsideHelp: boolean }) =>
     call<SubmitResult>("POST", `/attempts/${id}/submit`, body),
+  commitPlan: (id: number, body: PlanRequest) => call<Attempt>("POST", `/attempts/${id}/plan`, body),
+  startInterview: (id: number, minutes: number) => call<Attempt>("POST", `/attempts/${id}/interview`, { minutes }),
+  interview: () => call<InterviewOverview>("GET", "/interview"),
   solution: (id: number) => call<Attempt>("POST", `/attempts/${id}/solution`, { confirm: true }),
   journal: (q = "") => call<JournalEntry[]>("GET", `/journal?q=${encodeURIComponent(q)}`),
   journalEntry: (id: number) => call<JournalEntry>("GET", `/journal/${id}`),

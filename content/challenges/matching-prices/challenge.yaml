@@ -106,6 +106,10 @@ commonMistakes:
 explanationCheckpoint: Explain what your Map holds after you have gone through the first three items
   of [2, 7, 11, 15]. Then say the time complexity of your solution, and why a loop inside a loop
   would be slower.
+interview:
+  pattern: dsa.hash-maps
+  timeComplexity: O(n)
+  spaceComplexity: O(n)
 rubric:
   - criterion: Correctness
     description: All tests pass, including the edge cases and the large inputs.

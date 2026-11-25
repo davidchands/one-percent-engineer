@@ -65,6 +65,60 @@ export interface AttemptResponse {
   solution: string | null;
   lastSubmission: null | { code: string; explanation: string; results: TestRunResult; createdAt: string };
   metrics: Metric[];
+  /** Interview-style problems only: what you planned before coding, and how it compared. */
+  plan: PlanResult | null;
+  /** The optional countdown. null if you didn't start one. */
+  interview: InterviewTimer | null;
+}
+
+export interface PlanResult {
+  pattern: string;
+  timeComplexity: string;
+  spaceComplexity: string;
+  patternCorrect: boolean;
+  timeCorrect: boolean;
+  spaceCorrect: boolean;
+  /** Revealed only after you commit. */
+  answer: { pattern: string; patternName: string; timeComplexity: string; spaceComplexity: string };
+  committedAt: string;
+}
+
+export interface InterviewTimer {
+  minutes: number;
+  startedAt: string;
+  /** Known once the attempt passes. */
+  finishedWithin: boolean | null;
+}
+
+export interface PatternRow {
+  skillId: string;
+  name: string;
+  problems: number;
+  passed: number;
+  /** Plans you committed on this pattern, and how many named the pattern, the time and the space right. */
+  plans: number;
+  patternRight: number;
+  timeRight: number;
+  spaceRight: number;
+  lastPracticed: string | null;
+}
+
+export interface ReviewItem {
+  challengeId: string;
+  title: string;
+  pattern: string;
+  /** How many times you've passed it. Each pass pushes the next review further out. */
+  timesPassed: number;
+  lastPassedAt: string;
+  dueAt: string;
+  due: boolean;
+}
+
+export interface InterviewOverview {
+  patterns: PatternRow[];
+  review: ReviewItem[];
+  /** Pattern ids you most often mis-name when planning, worst first. */
+  weakestPatterns: { skillId: string; name: string; missed: number; plans: number }[];
 }
 
 export interface AttemptSummary {
