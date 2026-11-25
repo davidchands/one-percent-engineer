@@ -98,6 +98,12 @@ milestones, with two decisions along the way (server library, then JSON file or 
 [docs/BUILD-BY-LEARNING.md](docs/BUILD-BY-LEARNING.md). In VS Code, the **Build** panel shows your
 current step and runs the checks without leaving the editor.
 
+## Interview prep: data structures and algorithms
+
+A track of 25 skills (hash maps, two pointers, trees, graphs, dynamic programming and more) with
+problems where **speed is part of the test**: a correct but slow answer fails, as it would in an
+interview. Each problem teaches the pattern first. Details: [docs/DSA.md](docs/DSA.md).
+
 ## New challenges on demand
 
 With [Claude Code](https://claude.com/claude-code), type:

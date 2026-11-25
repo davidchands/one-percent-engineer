@@ -1,0 +1,106 @@
+id: balanced-brackets
+title: Are the brackets in this formula balanced?
+type: algorithm
+difficulty: 2
+sequence: 12
+context: spreadsheets
+skills:
+  - dsa.stacks
+  - dsa.complexity
+targetLevel: 3
+objective: Use a stack to check that every bracket is closed by the right kind, in the right order.
+lesson:
+  concept: A stack remembers the most recent thing you have not finished with
+  realWorldProblem: A spreadsheet has to warn you when a formula like (A1 + [B2 * {C3}]) has a bracket
+    that is missing or closed in the wrong order, before it tries to calculate anything.
+  whyItExists: "Counting brackets is not enough: ([)] has two of each kind but is wrong, because the (
+    was still open when ] tried to close the [. What matters is that the most recently opened
+    bracket must be closed first. A stack is built for exactly that: last in, first out."
+  howItWorks: A stack is an array where you only use push (add to the end) and pop (remove from the
+    end). Go through the text. When you see an opening bracket, push it. When you see a closing
+    bracket, pop the last opening bracket and check that it is the matching kind. If the stack is
+    empty or the kinds differ, it is unbalanced. At the end, the stack must be empty, or something
+    was never closed.
+  example:
+    code: |-
+      function hasMatchingQuotes(text) {
+        const stack = [];
+        for (const ch of text) {
+          if (ch === '<') stack.push(ch);
+          else if (ch === '>') {
+            if (stack.length === 0) return false;
+            stack.pop();
+          }
+        }
+        return stack.length === 0;
+      }
+
+      hasMatchingQuotes('<a<b>>'); // true
+    explanation: This one checks only < and >. Each < is pushed, each > pops one. '<a<b>>' pushes twice
+      and pops twice, ending empty, so it is balanced. A > with nothing to pop is an immediate
+      failure.
+  predict:
+    code: |-
+      const stack = [];
+      stack.push('a');
+      stack.push('b');
+      stack.push('c');
+      stack.pop();
+      console.log(stack.pop());
+    question: What does this print?
+    answer: b
+    why: The first pop removes 'c' (the last one pushed). The second pop removes and returns 'b'. Last
+      in, first out.
+  commonMistake: Only counting brackets, or only checking the stack is empty at the end. '(]' and ')('
+    both look fine to a counter.
+problem: |-
+  Write `isBalanced(formula)` and export it from solution.js. The formula is a string that may contain round brackets `()`, square brackets `[]` and curly brackets `{}`, plus any other characters.
+
+  Return `true` if every opening bracket is closed by the matching kind of closing bracket, in the right order, and no bracket is left open or closed too early. Return `false` otherwise. Characters that aren't brackets are ignored.
+requirements:
+  - Every closing bracket must match the most recent unclosed opening bracket.
+  - A closing bracket with nothing open is unbalanced.
+  - Any opening bracket still open at the end makes it unbalanced.
+  - Ignore all other characters. A text with no brackets is balanced.
+  - Finish in well under half a second for a formula of 200,000 characters.
+constraints:
+  - Use a stack (an array with push and pop), not repeated string replacement.
+examples:
+  - input: isBalanced('(a + [b * {c}])')
+    output: "true"
+  - input: isBalanced('([)]')
+    output: "false"
+    note: Two of each kind, but the order is wrong.
+  - input: isBalanced('((')
+    output: "false"
+edgeCasesToConsider:
+  - An empty string?
+  - A closing bracket first, like ')('?
+  - Brackets nested several levels deep?
+  - Brackets of different kinds that touch, like '(]'?
+beforeCoding:
+  - Walk through '{[()]}' by hand and write the stack after each character.
+  - What should happen if you pop an empty stack?
+hints:
+  - When you see a closing bracket, what do you need to know about the brackets that came before it?
+  - Push opening brackets onto an array. When you see a closing one, pop and compare. A small object
+    mapping each closer to its opener keeps the code tidy.
+  - "Two failures to handle: popping from an empty stack, and a stack that is not empty at the end."
+  - "Shape: const pairs = { ')': '(', ']': '[', '}': '{' }; for (const ch of formula) { if (opening)
+    stack.push(ch); else if (closing) { if (stack.pop() !== pairs[ch]) return false; } } return
+    stack.length === ___;"
+commonMistakes:
+  - Counting each kind of bracket, which accepts '([)]'.
+  - Forgetting that a stack can still hold open brackets at the end.
+  - Replacing '()' with '' over and over, which is correct but very slow on long formulas.
+  - Popping an empty stack and comparing undefined, which sometimes looks right by accident.
+explanationCheckpoint: Explain what the stack holds after each character of '{[()]}'. Then say the
+  time complexity of your solution, and the most memory it can use.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

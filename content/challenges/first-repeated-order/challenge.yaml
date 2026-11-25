@@ -1,0 +1,105 @@
+id: first-repeated-order
+title: The order number that was scanned twice
+type: algorithm
+difficulty: 2
+sequence: 11
+context: warehouse
+skills:
+  - dsa.hash-maps
+  - dsa.complexity
+targetLevel: 3
+objective: Use a Set to spot the first repeat in one pass, and say why that beats looking back
+  through the list each time.
+lesson:
+  concept: A Set remembers what you have seen, and answers 'seen it?' in one step
+  realWorldProblem: A warehouse scanner reads order numbers as parcels pass. Sometimes a parcel is
+    scanned twice and a customer is sent two. The manager wants the alert as soon as a repeat
+    appears, from a stream of 60,000 scans.
+  whyItExists: Looking back through every earlier scan for each new one means the work grows with the
+    square of the list. A Set holds just the values, with no positions, and finds a value in about
+    one step. 'Have I seen this?' is the question behind duplicates, visited places and caches.
+  howItWorks: "A Set is a Map with keys only. set.has(x) says whether x was added, and set.add(x) adds
+    it. Go through the list once. For each value: if the Set already has it, this is a repeat, so
+    stop. Otherwise add it and carry on. One pass, one lookup per item."
+  example:
+    code: |-
+      function firstLetterSeenTwice(text) {
+        const seen = new Set();
+        for (const letter of text) {
+          if (seen.has(letter)) return letter;
+          seen.add(letter);
+        }
+        return null;
+      }
+
+      firstLetterSeenTwice('abcb'); // 'b'
+    explanation: a, b and c are added. The next letter is b, and the Set already has it, so b is
+      returned. The letter that repeated earliest is the one whose SECOND appearance comes first.
+  predict:
+    code: |-
+      function f(items) {
+        const seen = new Set();
+        for (const x of items) {
+          if (seen.has(x)) return x;
+          seen.add(x);
+        }
+        return null;
+      }
+      console.log(f([1, 2, 2, 1]));
+    question: What does this print?
+    answer: "2"
+    why: Both 1 and 2 appear twice, but the second 2 (position 2) comes before the second 1 (position
+      3). The function returns at the first moment a repeat is found.
+  commonMistake: Returning the first item that has a copy anywhere in the list. For [1, 2, 2, 1] that
+    is 1, but the repeat that happens first is 2.
+problem: |-
+  A warehouse scanner produces a list of order numbers, in the order the parcels were scanned.
+
+  Write `firstRepeat(scans)` and export it from solution.js. Return the order number that is scanned a second time EARLIEST in the list, meaning the one whose second scan has the smallest position. If no order number repeats, return `null`.
+requirements:
+  - Return the order number whose second scan comes first in the list.
+  - Return null if every scan is different, or the list is empty.
+  - Order numbers are strings such as 'A-1017'. Compare them exactly.
+  - Finish in well under half a second for 60,000 scans.
+constraints:
+  - Don't change the array you are given. Sorting it counts as changing it.
+  - Don't copy the whole list to search it for each scan.
+examples:
+  - input: firstRepeat(['A1', 'B2', 'A1'])
+    output: "'A1'"
+  - input: firstRepeat(['A1', 'B2', 'B2', 'A1'])
+    output: "'B2'"
+    note: Both repeat, but B2's second scan comes before A1's.
+  - input: firstRepeat(['A1', 'B2'])
+    output: "null"
+edgeCasesToConsider:
+  - No repeats at all?
+  - A repeat at the very end of the list?
+  - "Two different numbers that both repeat: which wins?"
+  - An empty list?
+beforeCoding:
+  - For ['A1', 'B2', 'B2', 'A1'], write down which scan is the first one you recognise. What did you
+    have to remember?
+  - How many earlier scans does your method look at for each new scan?
+hints:
+  - As you go through the scans, what is the one thing you need to remember about the earlier ones?
+  - A Set stores values and tells you in one step whether it holds one. Which two Set methods do you
+    need?
+  - Check the Set before you add the scan. If it is already there, you have found the answer.
+  - "Shape: const seen = new Set(); for (const scan of scans) { if (seen.___(scan)) return ___;
+    seen.___(scan); } return null;"
+commonMistakes:
+  - Using scans.indexOf or includes for every scan, which looks through the list again each time and
+    gets very slow.
+  - Sorting the list to put duplicates together, which changes the input and loses the scan order.
+  - Returning the first item that has a duplicate anywhere, not the earliest second scan.
+explanationCheckpoint: Explain, for ['A1', 'B2', 'B2', 'A1'], what your Set holds when you return.
+  Then state the time and the memory your solution needs, in terms of n scans.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

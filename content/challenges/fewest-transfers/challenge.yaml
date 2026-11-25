@@ -1,0 +1,126 @@
+id: fewest-transfers
+title: The route with the fewest changes
+type: algorithm
+difficulty: 4
+sequence: 10
+context: transport
+skills:
+  - dsa.graphs
+  - dsa.queues
+targetLevel: 3
+objective: Use breadth-first search with a visited set to find the fewest hops between two nodes in
+  a graph that can contain loops.
+lesson:
+  concept: Breadth-first search explores a graph one step at a time, so the first time it reaches a
+    place is by the fewest steps
+  realWorldProblem: A transit app has to say how few stops away the airport is from where you are. The
+    lines cross and loop, so there are many ways to get there, and some are much longer than others.
+  whyItExists: "A network of stops is a graph: places (nodes) joined by connections (edges). It isn't
+    a list or a tree, because you can come back to where you started. To find the shortest way,
+    explore everything one hop away, then everything two hops away, and so on. The first time you
+    reach the airport, you got there by the fewest hops."
+  howItWorks: Keep a queue of places to visit and a Set of places already seen. Start with the start
+    stop at distance 0. Take a stop from the front of the queue. For each neighbour you have not
+    seen, mark it seen and add it to the back with distance + 1. When the stop you take out is the
+    destination, its distance is the answer. If the queue empties first, there is no route. The Set
+    is what stops loops from running forever.
+  example:
+    code: |-
+      function hopsTo(graph, from, to) {
+        const seen = new Set([from]);
+        const queue = [[from, 0]];
+        for (let i = 0; i < queue.length; i++) {
+          const [place, hops] = queue[i];
+          if (place === to) return hops;
+          for (const next of graph[place] ?? []) {
+            if (!seen.has(next)) {
+              seen.add(next);
+              queue.push([next, hops + 1]);
+            }
+          }
+        }
+        return -1;
+      }
+    explanation: The queue is an array that we read with an index (i) instead of shifting items off the
+      front, which would be slow on big arrays. Each place is added once, because it goes into
+      `seen` the moment it is queued. Places with no outgoing connections can be missing from the
+      graph, so graph[place] ?? [] handles them.
+  predict:
+    code: |-
+      const graph = { A: ['B'], B: ['A', 'C'], C: [] };
+      const seen = new Set(['A']);
+      const queue = ['A'];
+      for (const x of queue) {
+        for (const n of graph[x]) {
+          if (!seen.has(n)) { seen.add(n); queue.push(n); }
+        }
+      }
+      console.log(queue.join(''));
+    question: What does this print?
+    answer: ABC
+    why: A is queued first. A's neighbour B is new, so it is added. B's neighbours are A (already seen,
+      skipped) and C (new, added). The loop over `queue` keeps going as items are pushed on. Without
+      the Set, A and B would add each other forever.
+  commonMistake: Marking a place as seen only when you take it out of the queue. The same place can
+    then be queued many times by different neighbours, which wastes work and, in a big graph, a lot
+    of memory.
+problem: |-
+  Write `fewestTransfers(routes, from, to)` and export it from solution.js. `routes` is an object. Each key is a stop, and its value is an array of the stops you can travel to directly from it, for example `{ A: ['B', 'D'], B: ['C'] }`. A stop with no direct onward connections may be missing from the object.
+
+  Return the smallest number of direct connections needed to get from `from` to `to`, or `-1` if there is no route. Travelling from a stop to itself takes 0.
+requirements:
+  - Return the fewest connections from `from` to `to`.
+  - Return 0 when from and to are the same stop.
+  - Return -1 when there is no route.
+  - "Connections go one way: from A to B does not mean B to A, unless B lists A."
+  - Routes can loop back on themselves. The function must finish.
+  - Stops that are missing from `routes` have no onward connections.
+  - Finish in well under half a second for 60,000 stops in a chain.
+constraints:
+  - Don't change `routes`.
+examples:
+  - input: "fewestTransfers({ A: ['B', 'D'], B: ['C'], C: ['E'], D: ['E'] }, 'A', 'E')"
+    output: "2"
+    note: A → D → E is shorter than A → B → C → E.
+  - input: "fewestTransfers({ A: ['B'] }, 'B', 'A')"
+    output: "-1"
+    note: The connection only goes from A to B.
+  - input: fewestTransfers({}, 'A', 'A')
+    output: "0"
+edgeCasesToConsider:
+  - A loop, such as A → B → A?
+  - Two routes of different lengths?
+  - A destination that no stop connects to?
+  - Stops that appear only as destinations, so are not keys?
+beforeCoding:
+  - "Draw { A: ['B', 'D'], B: ['C'], C: ['E'], D: ['E'] } on paper. How many hops to each stop from
+    A, in order of distance?"
+  - What stops your search from going round a loop forever?
+hints:
+  - The first route you find with depth-first search is not always the shortest. What if you
+    explored all stops one hop away before any stop two hops away?
+  - A queue (first in, first out) explores in that order. Pair each stop in the queue with its
+    number of hops.
+  - Keep a Set of stops you have already queued, and add to it when you QUEUE a stop, so no stop is
+    queued twice.
+  - "Shape: const seen = new Set([from]); const queue = [[from, 0]]; for (let i = 0; i <
+    queue.length; i++) { const [stop, hops] = queue[i]; if (stop === to) return hops; for (const
+    next of routes[stop] ?? []) { if (!seen.has(next)) { seen.add(next); queue.push([next, ___]); }
+    } } return ___;"
+commonMistakes:
+  - Using depth-first search and returning the first route found, which may not be the shortest.
+  - Not remembering visited stops, so a loop runs forever.
+  - Keeping visited stops in an array and using includes, which is slow on big networks.
+  - Returning undefined instead of -1 when there is no route.
+  - Crashing on a stop that is not a key in routes.
+explanationCheckpoint: Explain why the first time your search reaches the destination is by the
+  fewest connections. Then state your time complexity in terms of stops and connections, and what
+  the visited Set costs in memory.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

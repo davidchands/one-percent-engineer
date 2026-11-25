@@ -1,0 +1,116 @@
+id: matching-prices
+title: Two gifts that use the whole budget
+type: algorithm
+difficulty: 2
+sequence: 10
+context: shopping
+skills:
+  - dsa.hash-maps
+  - dsa.complexity
+targetLevel: 3
+objective: Replace a search inside a loop with a Map lookup, so a list of 60,000 prices is answered instantly.
+lesson:
+  concept: A Map answers 'have I seen this before?' in one step, so you never need to search the list again
+  realWorldProblem: A gift shop lets customers pick two items that add up to exactly their voucher. A
+    customer with a €50 voucher wants to know, from a price list, which two items use all of it. The
+    shop has thousands of items, and the page has to answer before the customer gives up waiting.
+  whyItExists: The obvious method is to take each item and look through the rest of the list for its
+    partner. For 60,000 items that is about 1.8 billion checks, which takes seconds. A Map remembers
+    what you have already seen, so the partner is found with one lookup instead of a search. This is
+    the single most common speed-up in coding interviews.
+  howItWorks: "A Map stores key-and-value pairs and finds a key in about one step, however many keys
+    it holds. Walk the list once. For each price, ask: 'is the price I need to complete the budget
+    already in the Map?' If yes, you have your pair. If not, store this price (with its position)
+    and move on. Each item is looked at once, so the work grows in step with the list: O(n), instead
+    of O(n²) for the search-inside-a-loop."
+  example:
+    code: |-
+      function firstTwoThatMakeSum(nums, target) {
+        const seen = new Map(); // number -> position
+        for (let i = 0; i < nums.length; i++) {
+          const need = target - nums[i];
+          if (seen.has(need)) return [seen.get(need), i];
+          seen.set(nums[i], i);
+        }
+        return null;
+      }
+
+      firstTwoThatMakeSum([2, 7, 11, 15], 9); // [0, 1]
+    explanation: At i = 0 we need 7, but the Map is empty, so we store 2. At i = 1 the number is 7 and
+      we need 2. The Map has 2 at position 0, so the answer is [0, 1]. The list was walked once and
+      nothing was searched.
+  predict:
+    code: |-
+      const seen = new Map();
+      seen.set(4, 0);
+      seen.set(4, 1);
+      console.log(seen.get(4), seen.size);
+    question: What does this print?
+    answer: 1 1
+    why: Setting a key that already exists replaces its value. The Map still has one key (4), and its
+      value is now 1. When the same price can appear twice, decide whether you want to keep the
+      first position or the latest one.
+  commonMistake: Checking a number against itself. With a budget of 10 and a single item priced 5, the
+    'partner' of 5 is 5, but there is only one such item. Look in the Map before adding the current
+    item.
+problem: |-
+  A gift shop voucher must be spent in full on exactly two different items.
+
+  Write `findPair(prices, budget)` and export it from solution.js. `prices` is an array of whole numbers of cents. Return the positions `[i, j]` of two different items whose prices add up to exactly `budget`, with i smaller than j. If no two items do, return `null`.
+
+  If more than one pair works, return the pair whose second position j is smallest. If several pairs share that j, use the smallest i.
+requirements:
+  - Return [i, j] with i < j and prices[i] + prices[j] === budget.
+  - Never use the same item twice. Two different positions are needed, even if they hold the same
+    price.
+  - If several pairs work, return the one with the smallest j, and then the smallest i.
+  - Return null when no pair works, and for an empty list.
+  - Finish in well under half a second for a list of 60,000 prices.
+constraints:
+  - Don't change the array you are given.
+  - Return positions, not prices.
+examples:
+  - input: findPair([2, 7, 11, 15], 9)
+    output: "[0, 1]"
+  - input: findPair([2, 4, 6, 8], 10)
+    output: "[1, 2]"
+    note: 2 + 8 also works, but its j is 3, and [1, 2] has the smallest j.
+  - input: findPair([5, 3], 10)
+    output: "null"
+    note: 5 + 5 would need the same item twice.
+edgeCasesToConsider:
+  - A budget that needs two items with the same price?
+  - A single item whose price is exactly half the budget?
+  - "Several valid pairs: which one comes first?"
+  - An empty list?
+beforeCoding:
+  - For [2, 4, 6, 8] and a budget of 10, list every pair that works. Which one finishes earliest in
+    the list?
+  - As you reach each item, what exactly do you need to remember about the items before it?
+hints:
+  - Going through every pair works but is far too slow for 60,000 items. When you reach an item,
+    what single number would complete the budget?
+  - Keep a Map from price to position for the items you have already passed. How do you ask it
+    whether the number you need is there?
+  - Check the Map for the partner before you add the current item. Otherwise a lone item could match
+    itself.
+  - "Shape: const seen = new Map(); for (let j = 0; j < prices.length; j++) { const need = ___; if
+    (seen.has(need)) return [___, j]; if (!seen.has(prices[j])) seen.set(prices[j], j); } return
+    null;"
+commonMistakes:
+  - Looping over every pair, which is correct but takes seconds on a big list.
+  - Adding the current item to the Map before checking for its partner, so it can match itself.
+  - Returning the prices instead of the positions.
+  - Overwriting an earlier position with a later one for the same price, so the pair isn't the
+    earliest.
+explanationCheckpoint: Explain what your Map holds after you have gone through the first three items
+  of [2, 7, 11, 15]. Then say the time complexity of your solution, and why a loop inside a loop
+  would be slower.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

@@ -1,0 +1,107 @@
+id: reverse-playlist
+title: Playing the playlist backwards
+type: algorithm
+difficulty: 3
+sequence: 14
+context: music
+skills:
+  - dsa.linked-lists
+targetLevel: 3
+objective: Reverse a linked list by re-pointing each node's next link, without losing the rest of the list.
+lesson:
+  concept: A linked list is nodes pointing at the next node, and you change it by changing those pointers
+  realWorldProblem: "A music player keeps its queue as a chain: each song knows only which song comes
+    next. A 'play backwards' button needs the whole chain reversed, and the queue can hold hundreds
+    of thousands of songs."
+  whyItExists: An array stores items side by side, so inserting or moving things means shuffling many
+    items. A linked list stores each item in its own node with a pointer to the next, so changing
+    the order only changes pointers. Linked lists are also the simplest 'thing pointing at things',
+    which trees and graphs build on.
+  howItWorks: "A node looks like { value, next }, where next is another node, or null at the end. To
+    reverse the list, walk along it with three names: previous (the part already reversed, starting
+    as null), current (the node you are on) and following (the rest). At each node: save
+    current.next in `following` (or you will lose the rest), point current.next back at previous,
+    then move previous and current one step on. When current is null, previous is the new head."
+  example:
+    code: |-
+      function lastNode(head) {
+        let node = head;
+        while (node !== null && node.next !== null) {
+          node = node.next;
+        }
+        return node;
+      }
+
+      const list = { value: 'a', next: { value: 'b', next: null } };
+      lastNode(list).value; // 'b'
+    explanation: "To visit every node you follow next until it is null. There is no list[2]: you must
+      walk. The condition checks node.next so we stop ON the last node, not after it."
+  predict:
+    code: |-
+      const c = { value: 'c', next: null };
+      const b = { value: 'b', next: c };
+      const a = { value: 'a', next: b };
+      b.next = null;
+      console.log(a.next.next);
+    question: What does this print?
+    answer: "null"
+    why: a.next is b, and b.next was just changed to null, so a.next.next is null. The node c still
+      exists, but nothing points to it any more, so it is lost from the list. This is exactly what
+      happens if you overwrite next before saving it.
+  commonMistake: Setting current.next = previous before saving the old current.next. The rest of the
+    list is then unreachable and the answer has only one song.
+problem: |-
+  A playlist is a chain of nodes, each shaped `{ value, next }`, where `next` is the following node, or `null` for the last one. You are given the first node (the head), or `null` for an empty playlist.
+
+  Write `reversePlaylist(head)` and export it from solution.js. Reverse the chain by re-pointing the existing nodes' `next` links, and return the new head (the node that used to be last).
+requirements:
+  - Return the old last node as the new head, with the chain running back to the old head.
+  - The old head becomes the last node, so its next must be null.
+  - Reuse the same node objects. Don't create new nodes.
+  - Return null for an empty playlist (null) and the same node for a one-song playlist.
+  - Handle a playlist of 200,000 songs.
+constraints:
+  - "Don't copy the values into an array and rebuild the list: the test checks that the nodes are
+    the same objects."
+  - A very long list will overflow the call stack if you reverse it with recursion. Use a loop.
+examples:
+  - input: reversePlaylist(a → b → c)
+    output: c → b → a
+  - input: reversePlaylist(a)
+    output: a
+    note: A single node is its own reverse.
+  - input: reversePlaylist(null)
+    output: "null"
+edgeCasesToConsider:
+  - An empty list?
+  - A list with one node?
+  - Two nodes?
+  - Does the old head end up pointing at nothing?
+beforeCoding:
+  - Draw a → b → c as boxes and arrows. Redraw it reversed. Which arrows changed?
+  - If you point a at null first, how do you still reach b?
+hints:
+  - Reversing means every arrow points the other way. What do you need to remember before you change
+    an arrow?
+  - "Keep three names: previous (starts null), current (starts at head) and following. Save
+    current.next in following before changing it."
+  - "Each loop: following = current.next; current.next = previous; previous = current; current =
+    following."
+  - "Shape: let previous = null; let current = head; while (current !== null) { const following =
+    ___; current.next = ___; previous = ___; current = ___; } return previous;"
+commonMistakes:
+  - Changing current.next before saving it, so the rest of the list is lost.
+  - Returning the old head, which now has an empty chain after it.
+  - Forgetting to make the old head point at null, which creates a loop.
+  - Using recursion, which overflows the stack on very long lists.
+  - Building new nodes, which is not reversing the same chain.
+explanationCheckpoint: Explain what previous, current and following are after the first and second
+  loop for a → b → c. Then state your time and extra memory, and why no array is needed.
+rubric:
+  - criterion: Correctness
+    description: All tests pass, including the edge cases and the large inputs.
+  - criterion: Complexity
+    description: States the time and memory cost correctly, and explains why the slower obvious approach
+      is slower.
+  - criterion: Explanation
+    description: Traces a small example step by step and says what the key data structure holds at each step.

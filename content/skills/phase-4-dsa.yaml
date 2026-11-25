@@ -1,0 +1,384 @@
+# Skill graph: Phase 4 (data structures and algorithms, for technical interviews).
+#
+# Same schema as phase-1-foundations.yaml. Prerequisites reach back into phase 1 so the selector
+# only offers a DSA challenge once the JavaScript it needs is solid. Everything here is JavaScript.
+#
+# Levels, for every node here:
+#   1 explain it   2 trace it by hand   3 solve a problem with a hint   4 solve one unaided
+#   5 spot it in a disguised problem and meet the time limit   6 compare it with the alternatives
+
+skills:
+  - id: dsa.complexity
+    name: Time and space complexity (big-O)
+    domain: algorithms
+    phase: 4
+    why: Two programs can give the same answer and one finishes in a blink while the other never finishes. You need to predict which, before you run it.
+    prerequisites: [js.loops, js.arrays]
+    careerRelevance: 1.0
+    objectives:
+      "1": Say what O(1), O(n), O(n log n) and O(n²) mean, with one everyday example of each.
+      "2": Work out the complexity of a function with one or two loops by counting how often its inner line runs.
+      "3": Find the slow part of a working solution, with a hint.
+      "4": State the time and space complexity of your own solution, and say which input size breaks it.
+      "5": Predict whether a solution meets a time limit for an input of 100,000 or more items.
+      "6": Explain a trade-off between time and space, and when the slower, smaller solution is the right one.
+
+  - id: dsa.hash-maps
+    name: Hash maps and sets
+    domain: algorithms
+    phase: 4
+    why: Looking something up in a list means checking items one by one. A hash map answers "have I seen this?" in one step, which turns many slow solutions into fast ones.
+    prerequisites: [js.objects, dsa.complexity]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain what Map and Set do, and why looking up a key is fast.
+      "2": Trace code that counts, groups or de-duplicates with a Map or Set.
+      "3": Replace an inner search loop with a Map or Set lookup, with a hint.
+      "4": Solve "have I seen it before?" and "count each thing" problems unaided.
+      "5": Recognise a hash map solution in a problem that never mentions one.
+      "6": Say when a sorted array or an object is a better choice than a Map, and what a hash collision costs.
+
+  - id: dsa.two-pointers
+    name: Two pointers
+    domain: algorithms
+    phase: 4
+    why: Checking every pair of items in a list takes far too long on big lists. If the list is ordered, two markers walking inwards can do it in one pass.
+    prerequisites: [js.arrays, dsa.complexity]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain what two pointers are and what has to be true of the data for them to work.
+      "2": Trace two pointers moving inwards on a small sorted array.
+      "3": Write a pair-finding loop with two pointers, with a hint.
+      "4": Solve pair and partition problems on sorted data unaided.
+      "5": Spot where sorting first makes two pointers possible, and where pointers move in the same direction.
+      "6": Prove why discarding one pointer's item is safe at each step.
+
+  - id: dsa.sliding-window
+    name: Sliding window
+    domain: algorithms
+    phase: 4
+    why: Questions about "every stretch of k days" are slow if you add up each stretch from scratch. A window that slides along, adding one and dropping one, answers them in one pass.
+    prerequisites: [dsa.two-pointers]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain what a window is and what it saves compared with recounting.
+      "2": Trace a fixed-size window across an array, updating a running total.
+      "3": Write a fixed-size window, with a hint.
+      "4": Solve fixed and growing/shrinking window problems unaided.
+      "5": Recognise a window problem in words such as "longest stretch" or "any k in a row".
+      "6": Choose between a window and prefix sums, and say what each costs.
+
+  - id: dsa.prefix-sums
+    name: Prefix sums
+    domain: algorithms
+    phase: 4
+    why: If you will be asked for the total of many different stretches, adding each from scratch repeats work. Adding up once and subtracting answers each one instantly.
+    prerequisites: [js.arrays, dsa.complexity]
+    careerRelevance: 0.7
+    objectives:
+      "1": Explain what a prefix sum array holds.
+      "2": Build a prefix sum array by hand and answer a range question from it.
+      "3": Answer many range-total questions with one prefix array, with a hint.
+      "4": Solve range and "subarray with this total" problems unaided.
+      "5": Combine prefix sums with a Map to count stretches that add to a target.
+      "6": Explain when the extra memory isn't worth it.
+
+  - id: dsa.stacks
+    name: Stacks
+    domain: algorithms
+    phase: 4
+    why: "Some problems need \"the most recent thing I haven't finished with\": the open bracket, the last page you visited. A stack gives you exactly that, and nothing else."
+    prerequisites: [js.arrays]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain last-in, first-out and name three places a stack appears.
+      "2": Trace push and pop through a small example.
+      "3": Use a stack to match brackets or undo steps, with a hint.
+      "4": Solve matching and "next greater item" problems unaided.
+      "5": Recognise when a problem is secretly a stack, such as nested structure or a running to-do.
+      "6": Explain how the call stack relates to your own stack, and how to turn recursion into a loop.
+
+  - id: dsa.queues
+    name: Queues
+    domain: algorithms
+    phase: 4
+    why: When things must be handled in the order they arrived, a queue keeps that order. It is also what lets you explore things level by level.
+    prerequisites: [js.arrays, dsa.complexity]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain first-in, first-out and where queues appear.
+      "2": Trace enqueue and dequeue through a small example.
+      "3": Process items in arrival order with a queue, with a hint.
+      "4": Write a queue that stays fast on large inputs unaided.
+      "5": Explain why array.shift() is slow on big arrays, and what to do instead.
+      "6": Compare a queue, a stack and a priority queue for the same job.
+
+  - id: dsa.linked-lists
+    name: Linked lists
+    domain: algorithms
+    phase: 4
+    why: An array has to shuffle everything along to insert in the middle. A linked list only changes two links, and it is the simplest case of "things pointing at things", which trees and graphs build on.
+    prerequisites: [js.objects]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain what a node and a next pointer are, and how a list differs from an array.
+      "2": Draw a list as boxes and arrows and trace an insert or removal.
+      "3": Reverse or traverse a list, with a hint.
+      "4": Solve reverse, merge and remove-a-node problems unaided without losing the rest of the list.
+      "5": Use a slow and a fast pointer to find the middle or detect a cycle.
+      "6": Explain when a linked list beats an array, and why it rarely does in practice.
+
+  - id: dsa.recursion
+    name: Recursion
+    domain: algorithms
+    phase: 4
+    why: "Some problems contain a smaller copy of themselves: a folder holds folders, a tree holds trees. A function that calls itself matches that shape directly."
+    prerequisites: [js.functions, dsa.stacks]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain a base case and a recursive case, and why a missing base case never finishes.
+      "2": Trace a recursive call down and back up with a small input.
+      "3": Write a simple recursive function, with a hint.
+      "4": Solve problems on nested data recursively, unaided.
+      "5": Spot repeated work in a recursive solution and know that it is the cue for memoising.
+      "6": Convert recursion to a loop with your own stack, and say when you must (very deep inputs).
+
+  - id: dsa.binary-search
+    name: Binary search
+    domain: algorithms
+    phase: 4
+    why: Finding something in an ordered list by checking every item wastes the order. Halving the range each time finds it in about 20 steps in a list of a million.
+    prerequisites: [dsa.complexity, js.loops]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain why binary search needs ordered data and why it is fast.
+      "2": Trace a binary search on a small array, tracking low, high and middle.
+      "3": Write binary search with the right loop condition, with a hint.
+      "4": Find the first or last position that meets a condition unaided, without an off-by-one.
+      "5": Apply binary search to an answer range, not an array ("the smallest speed that works").
+      "6": Explain why it is O(log n) and what breaks if the data isn't truly ordered.
+
+  - id: dsa.sorting
+    name: Sorting
+    domain: algorithms
+    phase: 4
+    why: "Many hard-looking problems get easy once the data is in order: duplicates sit together, pairs line up, ranges can be merged. You need to know what sorting costs and what it gives you."
+    prerequisites: [dsa.complexity, dsa.recursion]
+    careerRelevance: 0.9
+    objectives:
+      "1": Describe how merge sort and quicksort work, in words.
+      "2": Trace one pass of a simple sort by hand.
+      "3": Use array.sort with a comparison function correctly, with a hint.
+      "4": Solve problems by sorting first, then scanning, unaided.
+      "5": Explain why the default sort compares as text, and why a bad comparator gives wrong results.
+      "6": Say when you can avoid an O(n log n) sort, for example with counting or a heap.
+
+  - id: dsa.intervals
+    name: Intervals
+    domain: algorithms
+    phase: 4
+    why: Meetings, bookings and shifts are all stretches of time. Questions like "do these overlap?" and "how many rooms do we need?" are one pattern once the stretches are sorted.
+    prerequisites: [dsa.sorting]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain what it means for two intervals to overlap, including touching ends.
+      "2": Sort intervals by start and trace a merge on a small example.
+      "3": Merge overlapping intervals, with a hint.
+      "4": Solve merge, insert and find-conflict problems unaided.
+      "5": Count the most overlaps at once using start and end events.
+      "6": Decide how touching intervals should be treated, and say why it matters.
+
+  - id: dsa.trees
+    name: Trees
+    domain: algorithms
+    phase: 4
+    why: Folders, comments, menus and org charts are all things that contain things. A tree is that shape, and almost every question about one is answered by asking the same question of each child.
+    prerequisites: [dsa.recursion, js.objects]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain root, child, leaf, depth and height.
+      "2": Trace a depth-first and a breadth-first walk of a small tree.
+      "3": Compute the height or the node count of a tree, with a hint.
+      "4": Solve traversal and path problems on binary trees unaided.
+      "5": Recognise when a problem needs a value passed down or a result passed up.
+      "6": Explain why a very deep tree overflows a recursive solution, and the fix.
+
+  - id: dsa.bst
+    name: Binary search trees
+    domain: algorithms
+    phase: 4
+    why: A tree arranged so everything on the left is smaller and everything on the right is larger gives you binary search on data that keeps changing.
+    prerequisites: [dsa.trees, dsa.binary-search]
+    careerRelevance: 0.8
+    objectives:
+      "1": State the binary search tree rule and why it makes lookup fast.
+      "2": Trace an insert and a lookup through a small tree.
+      "3": Validate a tree against the rule, with a hint.
+      "4": Insert, find and check a tree unaided, including the lower and upper bounds trap.
+      "5": Use an in-order walk to get sorted data out of the tree.
+      "6": Explain how an unbalanced tree degrades to O(n), and what balanced trees do about it.
+
+  - id: dsa.heaps
+    name: Heaps and priority queues
+    domain: algorithms
+    phase: 4
+    why: When you keep needing "the biggest" or "the smallest" of a changing collection, re-sorting each time is wasteful. A heap hands you the extreme in one step and stays cheap to update.
+    prerequisites: [dsa.trees, dsa.sorting]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain what a priority queue does and what a heap guarantees.
+      "2": Trace an insert and a remove-the-top on a small heap.
+      "3": Use a heap to find the k largest items, with a hint.
+      "4": Write a working min-heap or max-heap unaided.
+      "5": Recognise "top k", "merge k lists" and "running median" as heap problems.
+      "6": Compare a heap with sorting and with a balanced tree for the same job.
+
+  - id: dsa.tries
+    name: Tries
+    domain: algorithms
+    phase: 4
+    why: Autocomplete has to find every word that starts with what you've typed, instantly. Storing words letter by letter in a tree makes a shared start cost nothing.
+    prerequisites: [dsa.trees, dsa.hash-maps]
+    careerRelevance: 0.5
+    objectives:
+      "1": Explain how a trie stores words and why shared starts are stored once.
+      "2": Trace an insert and a prefix lookup.
+      "3": Build a trie with insert and search, with a hint.
+      "4": Solve prefix and autocomplete problems unaided.
+      "5": Recognise when a trie beats a Map of whole words.
+      "6": Discuss the memory cost of a trie and when it isn't worth it.
+
+  - id: dsa.graphs
+    name: Graphs and traversal (BFS and DFS)
+    domain: algorithms
+    phase: 4
+    why: Maps, friend networks and dependencies are things connected to other things, not a neat list or tree. Walking them without going round in circles is a skill of its own.
+    prerequisites: [dsa.queues, dsa.hash-maps, dsa.trees]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain nodes, edges, directed, undirected, and what an adjacency list is.
+      "2": Trace breadth-first and depth-first walks on a small graph.
+      "3": Find whether two nodes are connected, with a hint.
+      "4": Find the fewest steps between two nodes with BFS unaided, tracking what's been visited.
+      "5": Recognise a graph hiding in a grid, a word ladder or a set of dependencies.
+      "6": Choose BFS or DFS and justify it, including memory and the risk of a stack overflow.
+
+  - id: dsa.topological-sort
+    name: Topological sort
+    domain: algorithms
+    phase: 4
+    why: When some tasks must come before others (courses, builds, installs), you need an order that respects every rule, or to know that none exists.
+    prerequisites: [dsa.graphs]
+    careerRelevance: 0.7
+    objectives:
+      "1": Explain what a valid order of tasks with dependencies is.
+      "2": Trace the "remove what has no remaining dependency" method on a small graph.
+      "3": Produce an order for a small dependency list, with a hint.
+      "4": Detect a cycle and return no order, unaided.
+      "5": Recognise a scheduling or build-order problem as a topological sort.
+      "6": Explain why a cycle makes ordering impossible, and what the algorithm reports.
+
+  - id: dsa.shortest-paths
+    name: Shortest paths (Dijkstra)
+    domain: algorithms
+    phase: 4
+    why: "Routes have costs: time, money, distance. When steps aren't all equal, counting steps isn't enough, and you need to always extend the cheapest route found so far."
+    prerequisites: [dsa.graphs, dsa.heaps]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain why BFS fails when edges have different costs.
+      "2": Trace Dijkstra's algorithm on a small weighted graph.
+      "3": Compute cheapest costs from one node, with a hint.
+      "4": Implement it with a priority queue unaided.
+      "5": Spot a shortest-path problem in a travel-time or cost-minimising question.
+      "6": Explain why negative costs break it, and what to use instead.
+
+  - id: dsa.union-find
+    name: Union-find (disjoint sets)
+    domain: algorithms
+    phase: 4
+    why: Questions like "are these two people in the same group?" get slow if you re-search every time groups merge. Union-find answers them, and merges groups, in nearly constant time.
+    prerequisites: [dsa.graphs]
+    careerRelevance: 0.6
+    objectives:
+      "1": Explain what groups, find and union mean.
+      "2": Trace a few unions and finds on a small set.
+      "3": Count connected groups with union-find, with a hint.
+      "4": Implement find with path compression unaided.
+      "5": Recognise "connected components" and "does adding this link make a loop" problems.
+      "6": Compare union-find with a graph walk for static and growing data.
+
+  - id: dsa.backtracking
+    name: Backtracking
+    domain: algorithms
+    phase: 4
+    why: "Some problems ask for every arrangement that works: every route, every valid combination. You build one choice at a time and undo it when it leads nowhere."
+    prerequisites: [dsa.recursion]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain "choose, explore, undo" in your own words.
+      "2": Trace the choices tried for a tiny input such as all orderings of three items.
+      "3": Generate subsets or orderings, with a hint.
+      "4": Solve combination and placement problems unaided, pruning dead ends early.
+      "5": Count the number of branches a solution explores and say how pruning cuts them.
+      "6": Say when backtracking is necessary and when a smarter method exists.
+
+  - id: dsa.greedy
+    name: Greedy algorithms
+    domain: algorithms
+    phase: 4
+    why: Sometimes the best overall answer comes from always taking the best-looking choice right now. When that works it is wonderfully fast, and when it doesn't it gives wrong answers quietly.
+    prerequisites: [dsa.sorting]
+    careerRelevance: 0.8
+    objectives:
+      "1": Explain the greedy idea and give one example where it works and one where it fails.
+      "2": Trace a greedy choice sequence on a small input.
+      "3": Solve a scheduling problem by sorting then choosing greedily, with a hint.
+      "4": Solve classic greedy problems unaided.
+      "5": Find a counter-example that shows a greedy choice is wrong.
+      "6": Argue why a greedy choice is safe, by showing nothing better is lost.
+
+  - id: dsa.dp-1d
+    name: Dynamic programming (one dimension)
+    domain: algorithms
+    phase: 4
+    why: A recursive solution can solve the same smaller problem thousands of times. Saving each answer the first time makes an impossible solution fast.
+    prerequisites: [dsa.recursion, dsa.hash-maps]
+    careerRelevance: 1.0
+    objectives:
+      "1": Explain overlapping smaller problems and what remembering answers saves.
+      "2": Fill a small table by hand for a problem such as counting ways to climb stairs.
+      "3": Turn a recursive solution into one that remembers answers, with a hint.
+      "4": Solve one-dimensional problems (coins, house robber, longest increasing) unaided.
+      "5": Define the state and the step for a new problem before coding.
+      "6": Reduce memory by keeping only the part of the table you still need.
+
+  - id: dsa.dp-2d
+    name: Dynamic programming (two dimensions)
+    domain: algorithms
+    phase: 4
+    why: Problems about two sequences or a grid need two things remembered at once, such as how far through each. The table gets a second dimension but the thinking is the same.
+    prerequisites: [dsa.dp-1d]
+    careerRelevance: 0.9
+    objectives:
+      "1": Explain what each cell of a two-dimensional table stands for.
+      "2": Fill a small grid table by hand.
+      "3": Solve grid-path counting, with a hint.
+      "4": Solve edit distance or longest common subsequence unaided.
+      "5": Spot a two-sequence or grid problem that needs a 2D state.
+      "6": Compress a 2D table to two rows and say what you lose.
+
+  - id: dsa.bit-manipulation
+    name: Bit manipulation
+    domain: algorithms
+    phase: 4
+    why: Numbers are stored as bits, and a few operators on those bits let you pack many yes/no flags into one number and solve some puzzles with no extra memory.
+    prerequisites: [js.numbers, js.operators]
+    careerRelevance: 0.4
+    objectives:
+      "1": Write small numbers in binary and name &, |, ^, ~, << and >>.
+      "2": Trace what an operator does to the bits of two small numbers.
+      "3": Test, set and clear one bit, with a hint.
+      "4": Use XOR to find the one unpaired number, unaided.
+      "5": Explain how JavaScript treats bitwise operands as 32-bit integers, and where that bites.
+      "6": Know when bits help (flags, subsets) and when they only make code hard to read.
